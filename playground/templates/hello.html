@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{name}}  Bhajanka — Resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFBFC;
+    --grid:#DCE3EA;
+    --ink:#16213E;
+    --ink-soft:#4A5570;
+    --accent:#E2703A;
+    --teal:#2E6E6E;
+    --teal-tint:#E4EFEF;
+    --line:#CBD3DC;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  .page{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  /* ---- header ---- */
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: 14px;
+  }
+  .eyebrow svg{ flex-shrink:0; }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(34px, 6vw, 52px);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .role{
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--accent);
+    margin: 0 0 22px;
+  }
+
+  .contact{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+  }
+  .contact a{
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    transition: color .15s, border-color .15s;
+  }
+  .contact a:hover, .contact a:focus-visible{
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  hr{
+    border:none;
+    border-top: 1px solid var(--line);
+    margin: 40px 0;
+  }
+
+  /* ---- section labels ---- */
+  h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin: 0 0 24px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  h2::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background: var(--line);
+  }
+
+  /* ---- timeline (experience) ---- */
+  .timeline{ position:relative; padding-left: 110px; }
+  .entry{
+    position: relative;
+    padding-bottom: 26px;
+    border-left: 1px solid var(--line);
+    margin-left: 0;
+    padding-left: 22px;
+  }
+  .entry:last-child{ padding-bottom: 0; }
+  .entry::before{
+    content:'';
+    position:absolute;
+    left:-5px;
+    top: 4px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--paper);
+  }
+  .date{
+    position:absolute;
+    left:-132px;
+    top: 0;
+    width: 100px;
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .entry h3{
+    margin: 0 0 2px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .entry .org{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+  .entry ul{
+    margin: 0;
+    padding-left: 18px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+  .entry li{ margin-bottom: 4px; }
+
+  @media (max-width: 600px){
+    .timeline{ padding-left: 0; }
+    .date{ position: static; width:auto; text-align:left; margin-bottom: 4px; }
+    .entry{ padding-left: 18px; }
+  }
+
+  /* ---- skills ---- */
+  .skill-group{ margin-bottom: 18px; }
+  .skill-group:last-child{ margin-bottom:0; }
+  .skill-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 8px;
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    background: var(--teal-tint);
+    color: var(--teal);
+    border: 1px solid #CFE3E3;
+    padding: 5px 10px;
+    border-radius: 4px;
+  }
+
+  /* ---- two-column small lists ---- */
+  .cols{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  @media (max-width:600px){ .cols{ grid-template-columns: 1fr; gap: 24px; } }
+  .cols h2{ margin-bottom: 14px; }
+  .cols ul{ margin:0; padding:0; list-style:none; font-size: 14px; color: var(--ink-soft); }
+  .cols li{
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .cols li::before{
+    content:'·';
+    position:absolute;
+    left:0;
+    color: var(--accent);
+    font-weight:700;
+  }
+
+  /* ---- education ---- */
+  .edu{ margin-bottom: 18px; }
+  .edu:last-child{ margin-bottom: 0; }
+  .edu-top{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;}
+  .edu h3{ margin:0; font-size:16px; font-weight:600; }
+  .edu .when{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+  .edu .deg{ font-size: 14px; color: var(--ink-soft); margin: 2px 0 6px; }
+  .edu .deg span{ color: var(--teal); font-family:'IBM Plex Mono', monospace; font-size: 12.5px; }
+
+  footer{
+    margin-top: 56px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="eyebrow">
+    <svg width="46" height="16" viewBox="0 0 46 16" fill="none">
+      <polyline points="0,14 8,9 16,11 24,4 32,7 38,2 46,5" stroke="#E2703A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Field Log — Data Analyst
+  </div>
+    
+  {% if name %}
+  <h1>{{name}}</h1>
+  <p class="role">Computer Science Student & Data Analyst</p>
+  {% else %}
+  <h1>Some Person</h1>
+  {% endif %}
+  <div class="contact">
+    <a href="mailto:bhajankashashwat@gmail.com">bhajankashashwat@gmail.com</a>
+    <a href="https://linkedin.com/in/shashwat-bhajanka" target="_blank" rel="noopener">linkedin.com/in/shashwat-bhajanka</a>
+    <a href="https://github.com/ShashwatBhajanka" target="_blank" rel="noopener">github.com/ShashwatBhajanka</a>
+  </div>
+
+  <hr>
+
+  <section>
+    <h2>Education</h2>
+    <div class="edu">
+      <div class="edu-top">
+        <h3>Ashoka University</h3>
+        <span class="when">2025 — 2029</span>
+      </div>
+      <p class="deg">BSc in Computer Science <span>· Sonipat, India</span></p>
+    </div>
+    <div class="edu">
+      <div class="edu-top">
+        <h3>Fountainhead School</h3>
+        <span class="when">Graduated May 2025</span>
+      </div>
+      <p class="deg">IB Diploma, score 37/45 <span>· Surat, India</span></p>
+      <p class="deg">HL: Economics, Math AI, Computer Science &nbsp;·&nbsp; SL: English A, Hindi B, Psychology</p>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Experience</h2>
+    <div class="timeline">
+
+      <div class="entry">
+        <div class="date">Oct 2025 —<br>March 2026</div>
+        <h3>Content Creator</h3>
+        <div class="org">TYCHR · Remote, India</div>
+        <ul>
+          <li>Created online notes for IB AI HL mathematics and taught IB computer science through video, explaining complex concepts intuitively</li>
+          <li>Planned lessons using a variety of teaching strategies to meet diverse student needs</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="date">Oct 2024 —<br>Jan 2025</div>
+        <h3>Internship Project</h3>
+        <div class="org">Research Labs</div>
+        <ul>
+          <li>Launched an online self-checkout system, reducing wait times via real-time data processing and cloud-based architecture</li>
+          <li>Hit service time and quality targets while engaging customers to better understand their needs</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="date">Aug 2024 —<br>Sep 2024</div>
+        <h3>Virtual Intern</h3>
+        <div class="org">Groww</div>
+        <ul>
+          <li>Analyzed stocks to build portfolios for diverse demographics using predicted growth trends</li>
+          <li>Tracked progress and coordinated with team members on project management tasks</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="date">Jul 2024 —<br>Aug 2024</div>
+        <h3>Virtual Intern</h3>
+        <div class="org">Samsonite</div>
+        <ul>
+          <li>Developed a data-driven marketing strategy using Google Data Studio and Excel</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="date">Jun 2022 —<br>Aug 2022</div>
+        <h3>Intern</h3>
+        <div class="org">EcoVision</div>
+        <ul>
+          <li>Provided sustainable plastic waste management solutions and ran social campaigns to spread awareness</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Clubs &amp; Societies</h2>
+    <div class="timeline">
+      <div class="entry">
+        <div class="date">Present</div>
+        <h3>Head of Department: Research and Data Insights</h3>
+        <div class="org">Ashoka Data Society</div>
+        <ul>
+          <li>Work with university resources and varied data sources to conduct independent research, publishing insights in a data review</li>
+        </ul>
+      </div>
+      <div class="entry">
+        <div class="date">Present</div>
+        <h3>Full Stack Developer</h3>
+        <div class="org">Ashoka Ministry of Technology</div>
+        <ul>
+          <li>Build and maintain university online facilities and services</li>
+          <li>Use web development and data analytics to identify student needs, shipping projects used by 3,000+ students</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <h2>Skills</h2>
+    <div class="skill-group">
+      <div class="skill-label">Programming</div>
+      <div class="chips">
+        <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">Pseudocode</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-label">Tools</div>
+      <div class="chips">
+        <span class="chip">Excel</span><span class="chip">Google Data Studio</span><span class="chip">Cloud Architecture</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-label">Competencies</div>
+      <div class="chips">
+        <span class="chip">Data Analysis</span><span class="chip">Statistical Modelling</span><span class="chip">Analytical Thinking</span><span class="chip">Critical Thinking</span><span class="chip">Project Management</span>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="cols">
+    <div>
+      <h2>Achievements</h2>
+      <ul>
+        <li>Distinction, Euclid Mathematics Competition (2024)</li>
+        <li>Trinity Piano & Music Theory Level 1, Distinction – Grade 2 (2023–24)</li>
+        <li>First Place, Inter-School Competition (2023)</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Certifications</h2>
+      <ul>
+        <li>Machine Learning Basics (2024)</li>
+        <li>SQL Programming</li>
+        <li>Python — 100 Days</li>
+        <li>Financial Math</li>
+        <li>Econometrics</li>
+        <li>Data Science</li>
+        <li>Entrepreneurship</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Last updated · June 2026
+  </footer>
+
+</div>
+</body>
+</html>
