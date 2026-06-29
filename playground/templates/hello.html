@@ -3,25 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{name}}  Bhajanka — Resume</title>
+<title>{{name}} — Resume</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
 <style>
   :root{
     --paper:#FAFBFC;
     --grid:#DCE3EA;
     --ink:#16213E;
     --ink-soft:#4A5570;
+    --ink-muted:#7B8799;
     --accent:#E2703A;
+    --accent-glow:rgba(226,112,58,.18);
     --teal:#2E6E6E;
     --teal-tint:#E4EFEF;
+    --teal-glow:rgba(46,110,110,.12);
     --line:#CBD3DC;
+    --card-bg:#FFFFFF;
+    --shadow:0 2px 12px rgba(22,33,62,.06);
+    --radius:10px;
+    --transition: 0.35s cubic-bezier(.4,0,.2,1);
   }
 
-  *{ box-sizing: border-box; }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior: smooth; }
 
   body{
-    margin:0;
     background-color: var(--paper);
     background-image:
       linear-gradient(var(--grid) 1px, transparent 1px),
@@ -29,82 +38,201 @@
     background-size: 28px 28px;
     color: var(--ink);
     font-family: 'Inter', sans-serif;
-    line-height: 1.5;
+    line-height: 1.6;
+    padding-top: 68px;
   }
 
+  /* ===== NAVIGATION ===== */
+  nav{
+    position: fixed;
+    top:0; left:0; right:0;
+    z-index: 1000;
+    background: rgba(250,251,252,.82);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border-bottom: 1px solid var(--line);
+    transition: box-shadow var(--transition);
+  }
+  nav.scrolled{ box-shadow: 0 1px 20px rgba(22,33,62,.08); }
+  .nav-inner{
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 56px;
+    overflow-x: auto;
+    gap: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar{ display:none; }
+
+  .nav-brand{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight:500;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    margin-right: 12px;
+    flex-shrink:0;
+  }
+  .nav-brand span{ color: var(--accent); }
+
+  .nav-link{
+    flex-shrink:0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    font-weight:500;
+    color: var(--ink-muted);
+    background: transparent;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-link:hover{ color: var(--ink); background: var(--teal-tint); }
+  .nav-link.active{ color: var(--teal); background: var(--teal-glow); }
+
+  /* ===== PAGE ===== */
   .page{
     max-width: 760px;
     margin: 0 auto;
-    padding: 56px 24px 80px;
+    padding: 40px 24px 80px;
   }
 
-  /* ---- header ---- */
-  .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    color: var(--teal);
-    text-transform: uppercase;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom: 14px;
+  /* ===== REVEAL ANIMATION ===== */
+  .reveal{
+    opacity:0;
+    transform: translateY(28px);
+    transition: opacity .6s ease, transform .6s ease;
   }
-  .eyebrow svg{ flex-shrink:0; }
+  .reveal.visible{
+    opacity:1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1{ transition-delay:.1s; }
+  .reveal-delay-2{ transition-delay:.2s; }
+  .reveal-delay-3{ transition-delay:.3s; }
 
-  h1{
+  /* ===== HERO ===== */
+  .hero{
+    position: relative;
+    padding: 24px 0 8px;
+    margin-bottom: 10px;
+  }
+  .hero-accent{
+    width: 52px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+  .hero h1{
     font-family:'Fraunces', serif;
-    font-weight: 600;
-    font-size: clamp(34px, 6vw, 52px);
-    margin: 0 0 6px;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    font-size: clamp(40px, 7vw, 62px);
+    margin: 0 0 4px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
   }
-
-  .role{
+  .hero h1 .highlight{
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero .role{
     font-family:'Fraunces', serif;
     font-style: italic;
     font-weight: 600;
-    font-size: 19px;
+    font-size: 20px;
     color: var(--accent);
-    margin: 0 0 22px;
+    margin: 0 0 6px;
   }
-
+  .hero .tagline{
+    font-size: 15px;
+    color: var(--ink-soft);
+    max-width: 520px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
   .contact{
     display:flex;
     flex-wrap: wrap;
-    gap: 14px 22px;
+    gap: 10px 18px;
     font-family:'IBM Plex Mono', monospace;
     font-size: 13px;
   }
   .contact a{
     color: var(--ink-soft);
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     border-bottom: 1px solid var(--line);
-    transition: color .15s, border-color .15s;
+    transition: color .2s, border-color .2s, transform .2s;
   }
   .contact a:hover, .contact a:focus-visible{
     color: var(--accent);
     border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .contact a svg{ width:14px; height:14px; flex-shrink:0; opacity:.7; }
+
+  /* ===== TYPEWRITER ===== */
+  .typewriter{
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--accent);
+    animation: type 2.5s steps(30) forwards, blink .8s step-end infinite;
+    max-width: fit-content;
+  }
+  @keyframes type{
+    from{ width:0 }
+    to{ width:100% }
+  }
+  @keyframes blink{
+    50%{ border-color: transparent }
   }
 
-  hr{
+  /* ===== SECTIONS ===== */
+  section{ margin-bottom: 16px; }
+  .section-card{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    box-shadow: var(--shadow);
+    transition: box-shadow var(--transition), transform var(--transition);
+  }
+  .section-card:hover{
+    box-shadow: 0 6px 24px rgba(22,33,62,.08);
+  }
+
+  hr.section-divider{
     border:none;
-    border-top: 1px solid var(--line);
-    margin: 40px 0;
+    height:1px;
+    background: var(--line);
+    margin: 36px 0;
   }
 
-  /* ---- section labels ---- */
   h2{
     font-family:'IBM Plex Mono', monospace;
     font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--teal);
-    margin: 0 0 24px;
+    margin: 0 0 20px;
     display:flex;
     align-items:center;
-    gap: 10px;
+    gap: 12px;
   }
+  h2 .h2-icon{ font-size: 16px; }
   h2::after{
     content:'';
     flex:1;
@@ -112,36 +240,77 @@
     background: var(--line);
   }
 
-  /* ---- timeline (experience) ---- */
-  .timeline{ position:relative; padding-left: 110px; }
+  /* ===== EDUCATION ===== */
+  .edu-item{
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f2f5;
+  }
+  .edu-item:last-child{ border-bottom: none; padding-bottom: 0; }
+  .edu-item:first-child{ padding-top: 0; }
+  .edu-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .edu-top h3{
+    margin:0;
+    font-size:16px;
+    font-weight:600;
+  }
+  .edu-top .when{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    background: var(--teal-tint);
+    padding: 2px 10px;
+    border-radius: 4px;
+  }
+  .edu .deg{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 4px 0 0;
+  }
+  .edu .deg span{
+    color: var(--teal);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+  }
+
+  /* ===== TIMELINE (Experience / Clubs) ===== */
+  .timeline{ position:relative; }
   .entry{
     position: relative;
-    padding-bottom: 26px;
+    padding: 20px 0 20px 28px;
     border-left: 1px solid var(--line);
     margin-left: 0;
-    padding-left: 22px;
+    transition: background .2s;
+    border-radius: 0 6px 6px 0;
   }
   .entry:last-child{ padding-bottom: 0; }
   .entry::before{
     content:'';
     position:absolute;
     left:-5px;
-    top: 4px;
+    top: 24px;
     width: 9px;
     height: 9px;
     border-radius: 50%;
     background: var(--accent);
-    border: 2px solid var(--paper);
+    border: 2px solid var(--card-bg);
+    z-index:1;
   }
-  .date{
-    position:absolute;
-    left:-132px;
-    top: 0;
-    width: 100px;
-    text-align:right;
+  .entry .date{
     font-family:'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
+    font-size: 11px;
+    color: var(--ink-muted);
+    background: var(--teal-tint);
+    display: inline-block;
+    padding: 1px 10px;
+    border-radius: 4px;
+    margin-bottom: 6px;
   }
   .entry h3{
     margin: 0 0 2px;
@@ -153,261 +322,603 @@
     font-size: 12.5px;
     color: var(--teal);
     margin-bottom: 8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
   }
+  .entry .org svg{ width:13px; height:13px; opacity:.7; flex-shrink:0; }
   .entry ul{
     margin: 0;
     padding-left: 18px;
-    font-size: 14.5px;
+    font-size: 14px;
     color: var(--ink-soft);
   }
   .entry li{ margin-bottom: 4px; }
+  .entry li::marker{ color: var(--accent); }
 
   @media (max-width: 600px){
     .timeline{ padding-left: 0; }
-    .date{ position: static; width:auto; text-align:left; margin-bottom: 4px; }
-    .entry{ padding-left: 18px; }
+    .entry{ padding-left: 20px; }
   }
 
-  /* ---- skills ---- */
-  .skill-group{ margin-bottom: 18px; }
+  /* ===== SKILLS ===== */
+  .skill-group{ margin-bottom: 24px; }
   .skill-group:last-child{ margin-bottom:0; }
   .skill-label{
     font-family:'IBM Plex Mono', monospace;
     font-size: 11.5px;
     color: var(--ink-soft);
     text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: 8px;
+    letter-spacing: .08em;
+    margin-bottom: 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
   }
-  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .skill-label svg{ width:14px; height:14px; opacity:.7; }
+
+  .skill-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .skill-row:last-child{ margin-bottom:0; }
+  .skill-icon{
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: var(--teal-tint);
+    flex-shrink:0;
+    font-size: 18px;
+  }
+  .skill-icon i{ font-size: 18px; }
+  .skill-info{ flex:1; min-width:0; }
+  .skill-name{
+    display:flex;
+    justify-content:space-between;
+    font-size: 13.5px;
+    font-weight:500;
+    margin-bottom: 4px;
+  }
+  .skill-name .pct{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+  .skill-bar{
+    height: 6px;
+    background: #EFF2F6;
+    border-radius: 3px;
+    overflow: hidden;
+    position:relative;
+  }
+  .skill-bar-fill{
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--teal), #3A8A8A);
+    transition: width 1s ease;
+    width: 0%;
+  }
+  .skill-bar-fill.accent-fill{
+    background: linear-gradient(90deg, var(--accent), #F0945E);
+  }
+
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
   .chip{
     font-family:'IBM Plex Mono', monospace;
-    font-size: 12.5px;
+    font-size: 12px;
     background: var(--teal-tint);
     color: var(--teal);
     border: 1px solid #CFE3E3;
-    padding: 5px 10px;
-    border-radius: 4px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: transform .2s, box-shadow .2s;
+    cursor: default;
+  }
+  .chip:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px var(--teal-glow);
   }
 
-  /* ---- two-column small lists ---- */
+  /* ===== TWO-COLUMN LISTS ===== */
   .cols{
     display:grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
   }
   @media (max-width:600px){ .cols{ grid-template-columns: 1fr; gap: 24px; } }
-  .cols h2{ margin-bottom: 14px; }
+  .cols h2{ margin-bottom: 16px; }
   .cols ul{ margin:0; padding:0; list-style:none; font-size: 14px; color: var(--ink-soft); }
   .cols li{
-    padding-left: 16px;
+    padding: 8px 0 8px 20px;
     position: relative;
-    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f2f5;
   }
+  .cols li:last-child{ border-bottom: none; }
   .cols li::before{
-    content:'·';
+    content:'◆';
     position:absolute;
     left:0;
+    top:8px;
     color: var(--accent);
-    font-weight:700;
+    font-size: 8px;
   }
 
-  /* ---- education ---- */
-  .edu{ margin-bottom: 18px; }
-  .edu:last-child{ margin-bottom: 0; }
-  .edu-top{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;}
-  .edu h3{ margin:0; font-size:16px; font-weight:600; }
-  .edu .when{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
-  .edu .deg{ font-size: 14px; color: var(--ink-soft); margin: 2px 0 6px; }
-  .edu .deg span{ color: var(--teal); font-family:'IBM Plex Mono', monospace; font-size: 12.5px; }
+  /* ===== ACHIEVEMENTS / CERTS BADGES ===== */
+  .badge-list{ display:flex; flex-direction:column; gap:6px; }
+  .badge-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #F7F9FB;
+    border: 1px solid #EFF2F6;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    transition: transform .2s, background .2s, border-color .2s;
+  }
+  .badge-item:hover{
+    transform: translateX(4px);
+    background: var(--teal-tint);
+    border-color: #CFE3E3;
+  }
+  .badge-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background: var(--accent);
+    flex-shrink:0;
+  }
+  .badge-dot.teal{ background: var(--teal); }
 
+  /* ===== BACK TO TOP ===== */
+  .btt{
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(16px) scale(.9);
+    transition: opacity .35s ease, transform .35s ease, box-shadow .2s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .btt.visible{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .btt:hover{
+    box-shadow: 0 4px 20px rgba(22,33,62,.12);
+    transform: translateY(-2px) scale(1.05);
+  }
+  .btt svg{ width:18px; height:18px; stroke: var(--ink-soft); transition: stroke .2s; }
+  .btt:hover svg{ stroke: var(--accent); }
+
+  /* ===== FOOTER ===== */
   footer{
-    margin-top: 56px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
     font-family:'IBM Plex Mono', monospace;
     font-size: 12px;
-    color: var(--ink-soft);
+    color: var(--ink-muted);
     text-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
   }
+  footer .footer-hearts{ color: var(--accent); }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <div class="eyebrow">
-    <svg width="46" height="16" viewBox="0 0 46 16" fill="none">
-      <polyline points="0,14 8,9 16,11 24,4 32,7 38,2 46,5" stroke="#E2703A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- ===== NAVIGATION ===== -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <span class="nav-brand"><span>SB</span> · Resume</span>
+      <button class="nav-link active" data-target="hero">Home</button>
+      <button class="nav-link" data-target="education">Education</button>
+      <button class="nav-link" data-target="experience">Experience</button>
+      <button class="nav-link" data-target="clubs">Clubs</button>
+      <button class="nav-link" data-target="skills">Skills</button>
+      <button class="nav-link" data-target="achievements">More</button>
+    </div>
+  </nav>
+
+  <!-- ===== BACK TO TOP ===== -->
+  <button class="btt" id="btt" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
     </svg>
-    Field Log — Data Analyst
+  </button>
+
+  <div class="page">
+
+    <!-- ===== HERO ===== -->
+    <section id="hero" class="hero reveal visible" style="opacity:1;transform:none;">
+      <div class="hero-accent reveal reveal-delay-1" style="opacity:1;transform:none;"></div>
+      {% if name %}
+      <h1 class="reveal reveal-delay-1" style="opacity:1;transform:none;">{{name}}</h1>
+      <p class="role reveal reveal-delay-2" style="opacity:1;transform:none;">
+        <span class="typewriter">Computer Science Student & Data Analyst</span>
+      </p>
+      {% else %}
+      <h1>Some Person</h1>
+      {% endif %}
+      <p class="tagline reveal reveal-delay-3" style="opacity:1;transform:none;">
+        Building at the intersection of <strong>data</strong>, <strong>code</strong>, and <strong>impact</strong>.
+        Aspiring data analyst with hands-on experience in analytics, web development, and research.
+      </p>
+      <div class="contact reveal reveal-delay-3" style="opacity:1;transform:none;">
+        <a href="mailto:bhajankashashwat@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          bhajankashashwat@gmail.com
+        </a>
+        <a href="https://linkedin.com/in/shashwat-bhajanka" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          linkedin.com/in/shashwat-bhajanka
+        </a>
+        <a href="https://github.com/ShashwatBhajanka" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          github.com/ShashwatBhajanka
+        </a>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ===== EDUCATION ===== -->
+    <section id="education" class="reveal">
+      <div class="section-card">
+        <h2><span class="h2-icon">🎓</span>Education</h2>
+        <div class="edu-item">
+          <div class="edu-top">
+            <h3>Ashoka University</h3>
+            <span class="when">2025 — 2029</span>
+          </div>
+          <p class="deg">BSc in Computer Science <span>· Sonipat, India</span></p>
+        </div>
+        <div class="edu-item">
+          <div class="edu-top">
+            <h3>Fountainhead School</h3>
+            <span class="when">Graduated May 2025</span>
+          </div>
+          <p class="deg">IB Diploma, score 37/45 <span>· Surat, India</span></p>
+          <p class="deg">HL: Economics, Math AI, Computer Science &nbsp;·&nbsp; SL: English A, Hindi B, Psychology</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ===== EXPERIENCE ===== -->
+    <section id="experience" class="reveal">
+      <div class="section-card">
+        <h2><span class="h2-icon">💼</span>Experience</h2>
+        <div class="timeline">
+
+          <div class="entry">
+            <span class="date">Oct 2025 — Mar 2026</span>
+            <h3>Content Creator</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              TYCHR · Remote, India
+            </div>
+            <ul>
+              <li>Created online notes for IB AI HL mathematics and taught IB computer science through video, explaining complex concepts intuitively</li>
+              <li>Planned lessons using a variety of teaching strategies to meet diverse student needs</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <span class="date">Oct 2024 — Jan 2025</span>
+            <h3>Internship Project</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              Research Labs
+            </div>
+            <ul>
+              <li>Launched an online self-checkout system, reducing wait times via real-time data processing and cloud-based architecture</li>
+              <li>Hit service time and quality targets while engaging customers to better understand their needs</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <span class="date">Aug 2024 — Sep 2024</span>
+            <h3>Virtual Intern</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Groww
+            </div>
+            <ul>
+              <li>Analyzed stocks to build portfolios for diverse demographics using predicted growth trends</li>
+              <li>Tracked progress and coordinated with team members on project management tasks</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <span class="date">Jul 2024 — Aug 2024</span>
+            <h3>Virtual Intern</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Samsonite
+            </div>
+            <ul>
+              <li>Developed a data-driven marketing strategy using Google Data Studio and Excel</li>
+            </ul>
+          </div>
+
+          <div class="entry">
+            <span class="date">Jun 2022 — Aug 2022</span>
+            <h3>Intern</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22V12a10 10 0 0 1 20 0v10"/><path d="M2 16h20"/><path d="M12 12v6"/></svg>
+              EcoVision
+            </div>
+            <ul>
+              <li>Provided sustainable plastic waste management solutions and ran social campaigns to spread awareness</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ===== CLUBS & SOCIETIES ===== -->
+    <section id="clubs" class="reveal">
+      <div class="section-card">
+        <h2><span class="h2-icon">🌟</span>Clubs &amp; Societies</h2>
+        <div class="timeline">
+          <div class="entry">
+            <span class="date">Present</span>
+            <h3>Head of Department: Research and Data Insights</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Ashoka Data Society
+            </div>
+            <ul>
+              <li>Work with university resources and varied data sources to conduct independent research, publishing insights in a data review</li>
+            </ul>
+          </div>
+          <div class="entry">
+            <span class="date">Present</span>
+            <h3>Full Stack Developer</h3>
+            <div class="org">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              Ashoka Ministry of Technology
+            </div>
+            <ul>
+              <li>Build and maintain university online facilities and services</li>
+              <li>Use web development and data analytics to identify student needs, shipping projects used by 3,000+ students</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ===== SKILLS ===== -->
+    <section id="skills" class="reveal">
+      <div class="section-card">
+        <h2><span class="h2-icon">⚡</span>Skills &amp; Proficiency</h2>
+
+        <div class="skill-group">
+          <div class="skill-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Programming
+          </div>
+          <div class="skill-row">
+            <div class="skill-icon"><i class="devicon-python-plain colored"></i></div>
+            <div class="skill-info">
+              <div class="skill-name"><span>Python</span><span class="pct">Advanced</span></div>
+              <div class="skill-bar"><div class="skill-bar-fill" data-width="85"></div></div>
+            </div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-icon"><i class="devicon-mysql-plain colored"></i></div>
+            <div class="skill-info">
+              <div class="skill-name"><span>SQL</span><span class="pct">Proficient</span></div>
+              <div class="skill-bar"><div class="skill-bar-fill accent-fill" data-width="78"></div></div>
+            </div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-icon"><i class="devicon-javascript-plain colored"></i></div>
+            <div class="skill-info">
+              <div class="skill-name"><span>JavaScript</span><span class="pct">Intermediate</span></div>
+              <div class="skill-bar"><div class="skill-bar-fill" data-width="60"></div></div>
+            </div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-icon"><i class="devicon-html5-plain colored"></i></div>
+            <div class="skill-info">
+              <div class="skill-name"><span>HTML / CSS</span><span class="pct">Proficient</span></div>
+              <div class="skill-bar"><div class="skill-bar-fill accent-fill" data-width="80"></div></div>
+            </div>
+          </div>
+          <div class="skill-row">
+            <div class="skill-icon"><i class="devicon-django-plain colored"></i></div>
+            <div class="skill-info">
+              <div class="skill-name"><span>Django</span><span class="pct">Intermediate</span></div>
+              <div class="skill-bar"><div class="skill-bar-fill" data-width="55"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Tools
+          </div>
+          <div class="chips">
+            <span class="chip"><i class="devicon-excel-plain" style="margin-right:4px;"></i> Excel</span>
+            <span class="chip">Google Data Studio</span>
+            <span class="chip"><i class="devicon-amazonwebservices-plain colored" style="margin-right:4px;"></i> Cloud Architecture</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Competencies
+          </div>
+          <div class="chips">
+            <span class="chip">Data Analysis</span>
+            <span class="chip">Statistical Modelling</span>
+            <span class="chip">Analytical Thinking</span>
+            <span class="chip">Critical Thinking</span>
+            <span class="chip">Project Management</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <!-- ===== ACHIEVEMENTS & CERTIFICATIONS ===== -->
+    <section id="achievements" class="reveal">
+      <div class="section-card">
+        <div class="cols">
+          <div>
+            <h2><span class="h2-icon">🏆</span>Achievements</h2>
+            <div class="badge-list">
+              <div class="badge-item"><span class="badge-dot"></span> Distinction, Euclid Mathematics Competition (2024)</div>
+              <div class="badge-item"><span class="badge-dot teal"></span> Trinity Piano & Music Theory Level 1, Distinction – Grade 2 (2023–24)</div>
+              <div class="badge-item"><span class="badge-dot"></span> First Place, Inter-School Competition (2023)</div>
+            </div>
+          </div>
+          <div>
+            <h2><span class="h2-icon">📜</span>Certifications</h2>
+            <div class="badge-list">
+              <div class="badge-item"><span class="badge-dot teal"></span> Machine Learning Basics (2024)</div>
+              <div class="badge-item"><span class="badge-dot"></span> SQL Programming</div>
+              <div class="badge-item"><span class="badge-dot teal"></span> Python — 100 Days</div>
+              <div class="badge-item"><span class="badge-dot"></span> Financial Math</div>
+              <div class="badge-item"><span class="badge-dot teal"></span> Econometrics</div>
+              <div class="badge-item"><span class="badge-dot"></span> Data Science</div>
+              <div class="badge-item"><span class="badge-dot teal"></span> Entrepreneurship</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+      <span>Built with <span class="footer-hearts">✦</span> by {{name}}</span>
+      <span>Last updated · June 2026</span>
+    </footer>
+
   </div>
-    
-  {% if name %}
-  <h1>{{name}}</h1>
-  <p class="role">Computer Science Student & Data Analyst</p>
-  {% else %}
-  <h1>Some Person</h1>
-  {% endif %}
-  <div class="contact">
-    <a href="mailto:bhajankashashwat@gmail.com">bhajankashashwat@gmail.com</a>
-    <a href="https://linkedin.com/in/shashwat-bhajanka" target="_blank" rel="noopener">linkedin.com/in/shashwat-bhajanka</a>
-    <a href="https://github.com/ShashwatBhajanka" target="_blank" rel="noopener">github.com/ShashwatBhajanka</a>
-  </div>
 
-  <hr>
+  <script>
+    (function() {
+      'use strict';
 
-  <section>
-    <h2>Education</h2>
-    <div class="edu">
-      <div class="edu-top">
-        <h3>Ashoka University</h3>
-        <span class="when">2025 — 2029</span>
-      </div>
-      <p class="deg">BSc in Computer Science <span>· Sonipat, India</span></p>
-    </div>
-    <div class="edu">
-      <div class="edu-top">
-        <h3>Fountainhead School</h3>
-        <span class="when">Graduated May 2025</span>
-      </div>
-      <p class="deg">IB Diploma, score 37/45 <span>· Surat, India</span></p>
-      <p class="deg">HL: Economics, Math AI, Computer Science &nbsp;·&nbsp; SL: English A, Hindi B, Psychology</p>
-    </div>
-  </section>
+      /* ---------- SCROLL REVEAL ---------- */
+      const revealEls = document.querySelectorAll('.reveal');
+      const ro = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.10, rootMargin: '0px 0px -40px 0px' });
+      revealEls.forEach(el => ro.observe(el));
 
-  <hr>
+      /* ---------- SKILL BAR ANIMATION ---------- */
+      const barFills = document.querySelectorAll('.skill-bar-fill');
+      const barObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const w = el.getAttribute('data-width');
+            if (w) el.style.width = w + '%';
+            barObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+      barFills.forEach(el => barObserver.observe(el));
 
-  <section>
-    <h2>Experience</h2>
-    <div class="timeline">
+      /* ---------- NAV ACTIVE STATE ---------- */
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-link');
+      const navBar = document.getElementById('navbar');
 
-      <div class="entry">
-        <div class="date">Oct 2025 —<br>March 2026</div>
-        <h3>Content Creator</h3>
-        <div class="org">TYCHR · Remote, India</div>
-        <ul>
-          <li>Created online notes for IB AI HL mathematics and taught IB computer science through video, explaining complex concepts intuitively</li>
-          <li>Planned lessons using a variety of teaching strategies to meet diverse student needs</li>
-        </ul>
-      </div>
+      function updateNav() {
+        let current = 'hero';
+        sections.forEach(sec => {
+          const top = sec.getBoundingClientRect().top;
+          if (top <= 180) current = sec.id;
+        });
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.dataset.target === current);
+        });
+        navBar.classList.toggle('scrolled', window.scrollY > 30);
+      }
 
-      <div class="entry">
-        <div class="date">Oct 2024 —<br>Jan 2025</div>
-        <h3>Internship Project</h3>
-        <div class="org">Research Labs</div>
-        <ul>
-          <li>Launched an online self-checkout system, reducing wait times via real-time data processing and cloud-based architecture</li>
-          <li>Hit service time and quality targets while engaging customers to better understand their needs</li>
-        </ul>
-      </div>
+      /* ---------- SMOOTH SCROLL ON NAV CLICK ---------- */
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          const target = document.getElementById(link.dataset.target);
+          if (target) {
+            const offset = navBar.offsetHeight + 8;
+            const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        });
+      });
 
-      <div class="entry">
-        <div class="date">Aug 2024 —<br>Sep 2024</div>
-        <h3>Virtual Intern</h3>
-        <div class="org">Groww</div>
-        <ul>
-          <li>Analyzed stocks to build portfolios for diverse demographics using predicted growth trends</li>
-          <li>Tracked progress and coordinated with team members on project management tasks</li>
-        </ul>
-      </div>
+      /* ---------- BACK TO TOP ---------- */
+      const btt = document.getElementById('btt');
+      window.addEventListener('scroll', () => {
+        btt.classList.toggle('visible', window.scrollY > 500);
+        updateNav();
+      });
+      btt.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
 
-      <div class="entry">
-        <div class="date">Jul 2024 —<br>Aug 2024</div>
-        <h3>Virtual Intern</h3>
-        <div class="org">Samsonite</div>
-        <ul>
-          <li>Developed a data-driven marketing strategy using Google Data Studio and Excel</li>
-        </ul>
-      </div>
+      /* ---------- INITIAL NAV STATE ---------- */
+      updateNav();
 
-      <div class="entry">
-        <div class="date">Jun 2022 —<br>Aug 2022</div>
-        <h3>Intern</h3>
-        <div class="org">EcoVision</div>
-        <ul>
-          <li>Provided sustainable plastic waste management solutions and ran social campaigns to spread awareness</li>
-        </ul>
-      </div>
+      /* ---------- TYPEWRITER RESET ON VISIBILITY ---------- */
+      const tw = document.querySelector('.typewriter');
+      if (tw) {
+        const twObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              tw.style.animation = 'none';
+              void tw.offsetHeight;
+              tw.style.animation = 'type 2.5s steps(30) forwards, blink .8s step-end infinite';
+            }
+          });
+        }, { threshold: 0.5 });
+        twObserver.observe(tw);
+      }
+    })();
+  </script>
 
-    </div>
-  </section>
-
-  <hr>
-
-  <section>
-    <h2>Clubs &amp; Societies</h2>
-    <div class="timeline">
-      <div class="entry">
-        <div class="date">Present</div>
-        <h3>Head of Department: Research and Data Insights</h3>
-        <div class="org">Ashoka Data Society</div>
-        <ul>
-          <li>Work with university resources and varied data sources to conduct independent research, publishing insights in a data review</li>
-        </ul>
-      </div>
-      <div class="entry">
-        <div class="date">Present</div>
-        <h3>Full Stack Developer</h3>
-        <div class="org">Ashoka Ministry of Technology</div>
-        <ul>
-          <li>Build and maintain university online facilities and services</li>
-          <li>Use web development and data analytics to identify student needs, shipping projects used by 3,000+ students</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <hr>
-
-  <section>
-    <h2>Skills</h2>
-    <div class="skill-group">
-      <div class="skill-label">Programming</div>
-      <div class="chips">
-        <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">Pseudocode</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-label">Tools</div>
-      <div class="chips">
-        <span class="chip">Excel</span><span class="chip">Google Data Studio</span><span class="chip">Cloud Architecture</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-label">Competencies</div>
-      <div class="chips">
-        <span class="chip">Data Analysis</span><span class="chip">Statistical Modelling</span><span class="chip">Analytical Thinking</span><span class="chip">Critical Thinking</span><span class="chip">Project Management</span>
-      </div>
-    </div>
-  </section>
-
-  <hr>
-
-  <section class="cols">
-    <div>
-      <h2>Achievements</h2>
-      <ul>
-        <li>Distinction, Euclid Mathematics Competition (2024)</li>
-        <li>Trinity Piano & Music Theory Level 1, Distinction – Grade 2 (2023–24)</li>
-        <li>First Place, Inter-School Competition (2023)</li>
-      </ul>
-    </div>
-    <div>
-      <h2>Certifications</h2>
-      <ul>
-        <li>Machine Learning Basics (2024)</li>
-        <li>SQL Programming</li>
-        <li>Python — 100 Days</li>
-        <li>Financial Math</li>
-        <li>Econometrics</li>
-        <li>Data Science</li>
-        <li>Entrepreneurship</li>
-      </ul>
-    </div>
-  </section>
-
-  <footer>
-    Last updated · June 2026
-  </footer>
-
-</div>
 </body>
 </html>

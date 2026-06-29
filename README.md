@@ -4,8 +4,6 @@ A personal resume site built with **Django**, created as a learning project to g
 
 🔗 Live demo: (yet to host)
 
----
-
 ## Features
 
 - Single-page resume rendered through a Django template (education, experience, clubs & societies, skills, achievements, certifications)
@@ -42,8 +40,7 @@ MyDjangoProject/
     ├── migrations/
     ├── models.py
     ├── templates/
-    │   └── playground/
-    │       └── index.html     # resume template
+    │   └── hello.html         # resume template
     ├── urls.py
     └── views.py
 ```
@@ -108,6 +105,7 @@ MyDjangoProject/
 
 This project is part of getting comfortable with Django fundamentals:
 - Project vs. app structure
+
 - HTML programming and Styling
 - URL routing and the Django template engine
 - Using the admin site and debug toolbar during development
