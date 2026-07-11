@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+<script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-theme','dark')</script>
 <style>
   :root{
     --paper:#FAFBFC;
@@ -22,8 +23,25 @@
     --line:#CBD3DC;
     --card-bg:#FFFFFF;
     --shadow:0 2px 12px rgba(22,33,62,.06);
+    --nav-bg:rgba(250,251,252,.82);
     --radius:10px;
     --transition: 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  [data-theme="dark"]{
+    --paper:#12161F;
+    --grid:#1E2533;
+    --ink:#E4E8EE;
+    --ink-soft:#A0AAB8;
+    --ink-muted:#6B7688;
+    --accent:#E8845A;
+    --accent-glow:rgba(232,132,90,.15);
+    --teal:#3A9E9E;
+    --teal-tint:#1E2D2D;
+    --teal-glow:rgba(58,158,158,.12);
+    --line:#293040;
+    --card-bg:#1A202C;
+    --shadow:0 2px 12px rgba(0,0,0,.25);
+    --nav-bg:rgba(18,22,31,.85);
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
@@ -48,7 +66,7 @@
     position: fixed;
     top:0; left:0; right:0;
     z-index: 1000;
-    background: rgba(250,251,252,.82);
+    background: var(--nav-bg);
     backdrop-filter: blur(14px) saturate(1.3);
     -webkit-backdrop-filter: blur(14px) saturate(1.3);
     border-bottom: 1px solid var(--line);
@@ -98,6 +116,12 @@
   }
   .nav-link:hover{ color: var(--ink); background: var(--teal-tint); }
   .nav-link.active{ color: var(--teal); background: var(--teal-glow); }
+
+  .theme-toggle .sun-icon { display: block; }
+  .theme-toggle .moon-icon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun-icon { display: none; }
+  [data-theme="dark"] .theme-toggle .moon-icon { display: block; }
+  .theme-toggle svg { vertical-align: middle; }
 
   /* ===== PAGE ENTRANCE ===== */
   .page{
@@ -758,9 +782,30 @@
       grid-column: span 1;
     }
   }
+
+  /* ---- Page transition cover ---- */
+  .page-cover {
+    position: fixed;
+    z-index: 99999;
+    pointer-events: none;
+    display: none;
+    background: var(--paper);
+    background-image: linear-gradient(var(--teal) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--teal) 1px, transparent 1px);
+    background-size: 28px 28px;
+    transition: all 0.45s cubic-bezier(.4,0,.2,1);
+    border-radius: 10px;
+  }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
+
+<div id="page-cover" class="page-cover"></div>
 
   <!-- ===== NAVIGATION ===== -->
   <nav id="navbar">
@@ -772,6 +817,10 @@
       <a class="nav-link{% if section == 'clubs' %} active{% endif %}" href="{% url 'clubs' %}">Clubs</a>
       <a class="nav-link{% if section == 'skills' %} active{% endif %}" href="{% url 'skills' %}">Skills</a>
       <a class="nav-link{% if section == 'achievements' %} active{% endif %}" href="{% url 'achievements' %}">Achievements</a>
+      <button class="nav-link theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="moon-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
     </div>
   </nav>
 
@@ -784,7 +833,7 @@
 
   <div class="page">
 
-    {% block content %}{% endblock %}
+    <div id="pageContent">{% block content %}{% endblock %}</div>
 
     <footer>
       <span>Built with <span class="footer-hearts">✦</span> by {{name}}</span>
@@ -937,7 +986,92 @@
 
       /* ---------- INITIALIZE ---------- */
       onScroll();
+      initPageTransition();
     })();
+
+    function initPageTransition() {
+      var cover = document.getElementById('page-cover');
+      var fromCard = sessionStorage.getItem('fromCard');
+
+      function openPage(link, url) {
+        sessionStorage.setItem('fromCard', '1');
+        var rect = link.getBoundingClientRect();
+        cover.style.display = 'block';
+        cover.style.transition = 'none';
+        cover.style.top = rect.top + 'px';
+        cover.style.left = rect.left + 'px';
+        cover.style.width = rect.width + 'px';
+        cover.style.height = rect.height + 'px';
+        cover.style.borderRadius = '10px';
+        void cover.offsetHeight;
+        requestAnimationFrame(function() {
+          cover.style.transition = '';
+          cover.style.top = '0';
+          cover.style.left = '0';
+          cover.style.width = '100vw';
+          cover.style.height = '100vh';
+          cover.style.borderRadius = '0';
+        });
+        setTimeout(function() {
+          window.location.href = url;
+        }, 480);
+      }
+
+      document.querySelectorAll('.explorer-card').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          e.preventDefault();
+          var url = this.getAttribute('href');
+          if (!url) return;
+          openPage(this, url);
+        });
+      });
+
+      if (fromCard) {
+        sessionStorage.removeItem('fromCard');
+        cover.style.display = 'block';
+        cover.style.transition = 'none';
+        cover.style.top = '0';
+        cover.style.left = '0';
+        cover.style.width = '100vw';
+        cover.style.height = '100vh';
+        cover.style.borderRadius = '0';
+        void cover.offsetHeight;
+        requestAnimationFrame(function() {
+          cover.style.transition = '';
+          cover.style.top = '50%';
+          cover.style.left = '50%';
+          cover.style.width = '0';
+          cover.style.height = '0';
+          cover.style.borderRadius = '50%';
+          cover.style.opacity = '0';
+        });
+        setTimeout(function() {
+          cover.style.display = 'none';
+          cover.style.opacity = '';
+        }, 500);
+      }
+
+      initTheme();
+    }
+
+    function initTheme() {
+      var saved = localStorage.getItem('theme');
+      var toggle = document.getElementById('themeToggle');
+      if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      toggle.addEventListener('click', function() {
+        var html = document.documentElement;
+        var isDark = html.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
   </script>
 
 </body>
