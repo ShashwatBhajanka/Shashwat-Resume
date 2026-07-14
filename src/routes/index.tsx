@@ -227,7 +227,7 @@ const CERTIFICATIONS: Array<{
     title: "Data Science",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#003A4A", "#0891B2"],
+    gradient: ["#012A38", "#22D3EE"],
     isPlaceholder: true,
   },
   {
