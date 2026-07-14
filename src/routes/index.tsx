@@ -219,7 +219,7 @@ const CERTIFICATIONS: Array<{
     title: "Econometrics",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#1A0A2E", "#7C3AED"],
+    gradient: ["#200A38", "#A855F7"],
     isPlaceholder: true,
   },
   {
