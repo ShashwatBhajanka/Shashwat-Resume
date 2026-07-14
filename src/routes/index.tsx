@@ -151,7 +151,7 @@ const ACHIEVEMENTS: Array<{
     year: "2024",
     org: "University of Waterloo (CEMC)",
     desc: "Achieved a Distinction ranking in the Euclid Mathematics Contest, a competitive problem-solving exam covering algebra, geometry, and calculus.",
-    gradient: ["#0D2B2B", "#1A6B5A"],
+    gradient: ["#0B1F1A", "#2FAE86"],
     wide: true,
   },
   {
@@ -160,7 +160,7 @@ const ACHIEVEMENTS: Array<{
     year: "2023–24",
     org: "Trinity College London",
     desc: "Earned a Distinction in Grade 2 Piano Practical and Music Theory examinations, demonstrating proficiency in performance and theoretical understanding.",
-    gradient: ["#1A0A2E", "#6D28D9"],
+    gradient: ["#180C2E", "#B14AED"],
   },
   {
     emoji: "🥇",
@@ -168,7 +168,7 @@ const ACHIEVEMENTS: Array<{
     year: "2023",
     org: "Fountainhead School",
     desc: "Represented Fountainhead School as band lead and lead singer, securing first place.",
-    gradient: ["#2A1500", "#B45309"],
+    gradient: ["#2A0F00", "#F59E0B"],
   },
 ];
 
@@ -188,7 +188,7 @@ const CERTIFICATIONS: Array<{
     year: "2024",
     org: "Sung Kyun Kwan University",
     desc: "Completed an introductory course on Machine Learning. Learnt and practiced concepts such as supervised learning, regression, and classification models.",
-    gradient: ["#061828", "#0369A1"],
+    gradient: ["#031326", "#3B82F6"],
   },
   {
     emoji: "🗄️",
@@ -196,7 +196,7 @@ const CERTIFICATIONS: Array<{
     year: "2024",
     org: "Udemy",
     desc: "Learnt advanced SQL techniques, including complex data querying, multi-table joins, and data merging to drive actionable insights.",
-    gradient: ["#0A2818", "#047857"],
+    gradient: ["#052018", "#10B981"],
   },
   {
     emoji: "🐍",
@@ -204,14 +204,14 @@ const CERTIFICATIONS: Array<{
     year: "2024",
     org: "Udemy",
     desc: "Built 100 small projects over 100 days covering Python fundamentals, automation, web scraping, and game development.",
-    gradient: ["#1A1A00", "#B45309"],
+    gradient: ["#1F1400", "#EAB308"],
   },
   {
     emoji: "💰",
     title: "Financial Mathematics",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#12103A", "#4F46E5"],
+    gradient: ["#0E0B33", "#6366F1"],
     isPlaceholder: true,
   },
   {
@@ -219,7 +219,7 @@ const CERTIFICATIONS: Array<{
     title: "Econometrics",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#1A0A2E", "#7C3AED"],
+    gradient: ["#200A38", "#A855F7"],
     isPlaceholder: true,
   },
   {
@@ -227,7 +227,7 @@ const CERTIFICATIONS: Array<{
     title: "Data Science",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#003A4A", "#0891B2"],
+    gradient: ["#012A38", "#22D3EE"],
     isPlaceholder: true,
   },
   {
@@ -235,7 +235,7 @@ const CERTIFICATIONS: Array<{
     title: "Entrepreneurship",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#2A1000", "#C2410C"],
+    gradient: ["#2A0A00", "#F97316"],
     wide: true,
     isPlaceholder: true,
   },
@@ -249,7 +249,7 @@ function CardFront({ emoji, title, year, isPlaceholder }: { emoji: string; title
         <div className="text-[15px] font-semibold leading-tight text-white">{title}</div>
         <div className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-white/70">
           <span>{year ?? ""}</span>
-          <span>{isPlaceholder ? "add details" : "tap to flip"}</span>
+          <span>{isPlaceholder ? "add details →" : "reveal →"}</span>
         </div>
       </div>
     </>
