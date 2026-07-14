@@ -151,7 +151,7 @@ const ACHIEVEMENTS: Array<{
     year: "2024",
     org: "University of Waterloo (CEMC)",
     desc: "Achieved a Distinction ranking in the Euclid Mathematics Contest, a competitive problem-solving exam covering algebra, geometry, and calculus.",
-    gradient: ["#0D2B2B", "#1A6B5A"],
+    gradient: ["#0B1F1A", "#2FAE86"],
     wide: true,
   },
   {
