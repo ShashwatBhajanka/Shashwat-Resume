@@ -196,7 +196,7 @@ const CERTIFICATIONS: Array<{
     year: "2024",
     org: "Udemy",
     desc: "Learnt advanced SQL techniques, including complex data querying, multi-table joins, and data merging to drive actionable insights.",
-    gradient: ["#0A2818", "#047857"],
+    gradient: ["#052018", "#10B981"],
   },
   {
     emoji: "🐍",
