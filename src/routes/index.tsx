@@ -204,7 +204,7 @@ const CERTIFICATIONS: Array<{
     year: "2024",
     org: "Udemy",
     desc: "Built 100 small projects over 100 days covering Python fundamentals, automation, web scraping, and game development.",
-    gradient: ["#1A1A00", "#B45309"],
+    gradient: ["#1F1400", "#EAB308"],
   },
   {
     emoji: "💰",
