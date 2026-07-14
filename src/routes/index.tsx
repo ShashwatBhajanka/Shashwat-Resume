@@ -188,7 +188,7 @@ const CERTIFICATIONS: Array<{
     year: "2024",
     org: "Sung Kyun Kwan University",
     desc: "Completed an introductory course on Machine Learning. Learnt and practiced concepts such as supervised learning, regression, and classification models.",
-    gradient: ["#061828", "#0369A1"],
+    gradient: ["#031326", "#3B82F6"],
   },
   {
     emoji: "🗄️",
