@@ -1,36 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Experience</title>
+<style>
+  :root{
+    --bg:#f3f1ec;
+    --bg2:#eae7e0;
+    --ink:#1c1b19;
+    --ink-soft:#5b5850;
+    --line:rgba(28,27,25,0.10);
+    --line-strong:rgba(28,27,25,0.18);
+    --glass:rgba(255,255,255,0.6);
+    --accent:#3c4a5e;
+    --accent-soft:#8a97a6;
+    --gold:#a9834f;
+    --shadow-sm:0 8px 20px -10px rgba(28,27,25,0.14);
+    --shadow-lg:0 34px 70px -20px rgba(28,27,25,0.24), 0 12px 26px -12px rgba(28,27,25,0.14);
+    --serif:'Iowan Old Style','Palatino Linotype',Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
 
-<div class="container">
-  <div class="card-column column-0">
-    <div class="card card-color-0">
-      <div class="border"></div>
-      <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/53148/deathtostock-00.jpg" />
-      <h1>Hey now, you're an allstar</h1>
+    --fs-h1:   clamp(2.2rem, 1.4rem + 3.4vw, 4.2rem);
+    --fs-h2:   clamp(1.5rem, 1.25rem + 1.1vw, 2rem);
+    --fs-h3:   clamp(1.2rem, 1.05rem + 0.7vw, 1.5rem);
+    --fs-body: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+    --fs-small:clamp(0.78rem, 0.74rem + 0.15vw, 0.85rem);
+    --fs-tag:  clamp(0.7rem, 0.68rem + 0.1vw, 0.76rem);
+    --fs-stat: clamp(2.2rem, 1.6rem + 2.6vw, 3.6rem);
+
+    --space-section: clamp(3rem, 2rem + 4vw, 7rem);
+    --space-card:    clamp(1.4rem, 1rem + 1.4vw, 2rem);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    cursor:none;
+    overflow-x:hidden;
+  }
+  a, button{ cursor:none; }
+  @media (hover:none){ body, a, button{ cursor:auto; } }
+
+  /* ---------------- custom cursor ---------------- */
+  .cursor-dot, .cursor-ring{
+    position:fixed; top:0; left:0;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:999;
+    transform:translate(-50%,-50%);
+  }
+  .cursor-dot{ width:6px; height:6px; background:var(--ink); }
+  .cursor-ring{
+    width:38px; height:38px;
+    border:1px solid var(--line-strong);
+    background:rgba(255,255,255,0.25);
+    backdrop-filter:blur(2px);
+    transition:width .25s ease, height .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .cursor-ring.active{
+    width:64px; height:64px;
+    border-color:var(--gold);
+    background:rgba(169,131,79,0.08);
+  }
+  @media (hover:none){ .cursor-dot, .cursor-ring{ display:none; } }
+
+  /* ---------------- draped fabric background: noise as a height field, lit and animated ---------------- */
+  .page{ position:relative; }
+  .fabric-wrap{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    opacity:0.9;
+    mix-blend-mode:multiply;
+  }
+  .fabric-wrap svg{ width:100%; height:100%; display:block; }
+  .fabric-light{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    mix-blend-mode:soft-light;
+    opacity:0.55;
+    background:radial-gradient(480px circle at var(--lx,50%) var(--ly,38%), rgba(255,255,255,0.6), transparent 62%);
+    transition:opacity .5s ease;
+  }
+
+  .grain{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:1200px; margin-inline:auto; padding-inline:clamp(1.25rem, 4vw, 2.5rem); }
+
+  /* ---------------- hero / kinetic type ---------------- */
+  .hero{
+    min-height:88vh;
+    display:flex; flex-direction:column; justify-content:center;
+    gap:clamp(1rem, 2vw, 1.5rem);
+    max-width:50rem;
+    padding-block:clamp(2rem, 6vw, 4rem);
+  }
+  .kicker{
+    display:inline-flex; align-items:center; gap:0.6rem;
+    font-size:var(--fs-small); letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .kicker::before{ content:''; width:1.4rem; height:1px; background:var(--gold); }
+
+  .hero h1{
+    font-family:var(--serif); font-weight:400;
+    font-size:var(--fs-h1); line-height:1.14; letter-spacing:-0.01em;
+    margin:0; overflow-wrap:break-word;
+  }
+  .hero h1 .letter{
+    display:inline-block;
+    opacity:0;
+    transform:translateY(46px) rotate(8deg);
+    transition:opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.2,1.4,.3,1);
+  }
+  .hero h1 .letter.shown{ opacity:1; transform:translateY(0) rotate(0deg); }
+  .hero h1 .letter.idle{ animation:bob var(--dur,3.4s) ease-in-out var(--bd,0s) infinite alternate; }
+  @keyframes bob{ from{ transform:translateY(0);} to{ transform:translateY(-7px);} }
+
+  .hero p{ font-size:var(--fs-body); line-height:1.7; color:var(--ink-soft); max-width:34rem; margin:0; }
+
+  /* ---------------- stats strip ---------------- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(9rem, 1fr));
+    gap:clamp(1.5rem, 3vw, 2.5rem);
+    padding-block:clamp(1.5rem, 3vw, 2.5rem);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    margin-bottom:var(--space-section);
+  }
+  .stat{ display:flex; flex-direction:column; gap:0.35rem; }
+  .stat .num{
+    font-family:var(--serif); font-size:var(--fs-stat); letter-spacing:-0.02em; color:var(--ink);
+  }
+  .stat .label{ font-size:var(--fs-small); color:var(--ink-soft); letter-spacing:0.02em; }
+
+  /* ---------------- marquee ticker ---------------- */
+  .ticker{
+    overflow:hidden;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    margin-bottom:var(--space-section);
+    -webkit-mask-image:linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+            mask-image:linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  }
+  .ticker-track{
+    display:flex; width:max-content;
+    animation:marquee 26s linear infinite;
+  }
+  .ticker-track span{
+    font-family:var(--serif); font-style:italic;
+    font-size:clamp(1.1rem, 1rem + 1vw, 1.6rem);
+    color:var(--ink-soft);
+    padding:1rem clamp(1.25rem, 3vw, 2.5rem);
+    white-space:nowrap;
+  }
+  .ticker-track span::after{ content:'—'; margin-left:clamp(1.25rem, 3vw, 2.5rem); color:var(--gold); }
+  @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+  /* ---------------- section header w/ watermark ---------------- */
+  .section-header{
+    position:relative;
+    display:flex; flex-direction:column; gap:0.75rem;
+    padding-block:0 clamp(1.5rem, 3vw, 2.5rem);
+    max-width:44rem;
+  }
+  .watermark{
+    position:absolute;
+    left:-4vw; top:-8vw;
+    font-family:var(--serif);
+    font-size:clamp(5rem, 4rem + 10vw, 13rem);
+    color:transparent;
+    -webkit-text-stroke:1px var(--line-strong);
+    white-space:nowrap;
+    z-index:-1;
+    user-select:none;
+    pointer-events:none;
+  }
+  .section-header h2{
+    font-family:var(--serif); font-weight:400; font-size:var(--fs-h2); letter-spacing:-0.01em; margin:0;
+  }
+
+  /* ---------------- card grid ---------------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap:clamp(1.25rem, 2.5vw, 2rem);
+    padding-bottom:var(--space-section);
+    perspective:1600px;
+  }
+
+  .card{
+    position:relative;
+    display:flex; flex-direction:column;
+    background:linear-gradient(155deg, var(--glass), rgba(255,255,255,0.32));
+    border:1px solid var(--line-strong);
+    border-radius:1.1rem;
+    padding:var(--space-card);
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+    transform-style:preserve-3d;
+    transition:transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease,
+               opacity 0.6s ease, translate 0.9s cubic-bezier(.2,1.5,.3,1);
+    opacity:0;
+    translate:0 2.5rem;
+    rotate:-3deg;
+  }
+  .card.in-view{ opacity:1; translate:0 0; rotate:0deg; }
+  .card:hover{ box-shadow:var(--shadow-lg); }
+
+  .card .shine{
+    position:absolute; inset:0;
+    background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.55), transparent 60%);
+    opacity:0; transition:opacity 0.3s ease;
+    pointer-events:none;
+  }
+  .card:hover .shine{ opacity:1; }
+
+  .card .num{
+    position:absolute;
+    right:0.6rem; top:-0.6rem;
+    font-family:var(--serif);
+    font-size:5.5rem;
+    color:transparent;
+    -webkit-text-stroke:1px var(--line-strong);
+    z-index:0;
+    user-select:none;
+  }
+
+  .card-head{
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:space-between; gap:0.75rem;
+    margin-bottom:0.9rem; flex-wrap:wrap;
+  }
+  .card-head .org{ font-size:var(--fs-small); color:var(--accent); letter-spacing:0.02em; }
+  .card-head .when{ display:inline-flex; align-items:center; gap:0.4rem; font-size:var(--fs-small); color:var(--ink-soft); white-space:nowrap; }
+  .card-head .when .dot{ width:0.4rem; height:0.4rem; border-radius:50%; background:var(--gold); }
+
+  .card h3{ position:relative; z-index:1; font-family:var(--serif); font-weight:400; font-size:var(--fs-h3); letter-spacing:-0.01em; margin:0 0 0.9rem; }
+
+  .card ul{ position:relative; z-index:1; display:flex; flex-direction:column; gap:0.5rem; margin:0 0 1.1rem; padding:0; list-style:none; flex:1 1 auto; }
+  .card li{ display:flex; gap:0.55rem; font-size:var(--fs-body); line-height:1.55; color:var(--ink-soft); }
+  .card li::before{ content:''; flex:0 0 auto; width:0.3rem; height:0.3rem; margin-top:0.55em; border-radius:50%; background:var(--accent-soft); }
+
+  .tags{ position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:auto; }
+  .tags span{ font-size:var(--fs-tag); color:var(--ink-soft); border:1px solid var(--line-strong); background:rgba(255,255,255,0.55); padding:0.3rem 0.7rem; border-radius:999px; }
+
+  .outro{ position:relative; z-index:1; text-align:center; padding-bottom:clamp(3rem, 6vw, 6rem); color:var(--ink-soft); font-size:var(--fs-small); }
+
+  @media (prefers-reduced-motion: reduce){
+    .card{ transition:none; opacity:1; translate:0 0; rotate:0deg; }
+    .hero h1 .letter{ opacity:1; transform:none; transition:none; animation:none; }
+    .ticker-track{ animation:none; }
+    .fabric-wrap svg animate{ display:none; }
+    body{ cursor:auto; }
+    .cursor-dot,.cursor-ring{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cdot"></div>
+<div class="cursor-ring" id="cring"></div>
+
+<div class="fabric-wrap" aria-hidden="true">
+  <svg width="100%" height="100%" preserveAspectRatio="none">
+    <filter id="fabricFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="4" seed="7" result="noise">
+        <animate attributeName="baseFrequency" values="0.006 0.011;0.010 0.007;0.006 0.011" dur="42s" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="2.2" result="softNoise"/>
+      <feDiffuseLighting in="softNoise" lighting-color="#fbf9f4" surfaceScale="7.5" diffuseConstant="1.2" result="light">
+        <feDistantLight azimuth="235" elevation="52">
+          <animate attributeName="azimuth" values="200;270;200" dur="36s" repeatCount="indefinite"/>
+          <animate attributeName="elevation" values="48;58;48" dur="24s" repeatCount="indefinite"/>
+        </feDistantLight>
+      </feDiffuseLighting>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#fabricFilter)"/>
+  </svg>
+</div>
+<div class="fabric-light" id="fabricLight"></div>
+<div class="grain"></div>
+
+<div class="page" id="page">
+
+  <div class="wrap">
+
+    <section class="hero">
+      <div class="kicker">shashwat bhajanka</div>
+      <h1 id="heroTitle">Data, built carefully.</h1>
+      <p>Computer science student focused on data analytics and full-stack engineering — currently reading, building, and shipping small, considered things.</p>
+    </section>
+
+    <section class="stats" id="stats">
+      <div class="stat"><span class="num" data-target="6">0</span><span class="label">roles &amp; positions</span></div>
+      <div class="stat"><span class="num" data-target="4">0</span><span class="label">industries touched</span></div>
+      <div class="stat"><span class="num" data-target="60" data-suffix="%">0%</span><span class="label">manual work automated away</span></div>
+      <div class="stat"><span class="num" data-target="2029">0</span><span class="label">graduating class</span></div>
+    </section>
+
+    <div class="ticker">
+      <div class="ticker-track" id="tickerTrack"></div>
     </div>
-    <div class="card card-color-2">
-      <div class="border"></div>
-      <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/53148/deathtostock-02.jpg" />
-      <h1>Hey now, you're a rock star</h1>
-    </div>
-  </div>
-  <div class="card-column column-1">
-    <div class="card card-color-1">
-      <div class="border"></div>
-      <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/53148/deathtostock-01.jpg" />
-      <h1>Get your game on, go play</h1>
-    </div>
-    <div class="card card-color-3">
-      <div class="border"></div>
-      <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/53148/deathtostock-03.jpg" />
-      <h1>Get the show on, get paid</h1>
-    </div>
+
+    <header class="section-header">
+      <div class="watermark">Experience</div>
+      <div class="kicker">experience</div>
+      <h2>Where the work has taken me</h2>
+    </header>
+
+    <section class="grid" id="grid"></section>
+
+    <div class="outro">— that's the timeline, for now —</div>
+
   </div>
 </div>
 
-<div id="cover" class="cover"></div>
+<script>
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-<div id="open-content" class="open-content">
-  <a href="#" id="close-content" class="close-content"><span class="x-1"></span><span class="x-2"></span></a>
-  <img id="open-content-image" src="" />
-  <div class="text" id="open-content-text">
-  </div>
-</div>
+/* ---------------- custom magnetic cursor ---------------- */
+if (!reduceMotion && matchMedia('(hover:hover)').matches){
+  const dot = document.getElementById('cdot');
+  const ring = document.getElementById('cring');
+  let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+  window.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  function loop(){
+    rx += (mx-rx)*0.16; ry += (my-ry)*0.16;
+    dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+  document.querySelectorAll('a, button, .card').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('active'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('active'));
+  });
+}
+
+/* ---------------- fabric light: soft highlight that follows the cursor across the folds ---------------- */
+const fabricLight = document.getElementById('fabricLight');
+if (!reduceMotion && fabricLight){
+  window.addEventListener('mousemove', e => {
+    fabricLight.style.setProperty('--lx', (e.clientX / window.innerWidth * 100) + '%');
+    fabricLight.style.setProperty('--ly', (e.clientY / window.innerHeight * 100) + '%');
+  });
+  window.addEventListener('mouseleave', () => { fabricLight.style.opacity = '0'; });
+  window.addEventListener('mouseenter', () => { fabricLight.style.opacity = '0.55'; });
+}
+
+/* ---------------- watermark parallax ---------------- */
+const watermark = document.querySelector('.watermark');
+let ticking = false;
+function onScroll(){
+  if (watermark) watermark.style.transform = `translateX(${window.scrollY * -0.05}px)`;
+}
+window.addEventListener('scroll', () => {
+  if (!ticking){ requestAnimationFrame(() => { onScroll(); ticking = false; }); ticking = true; }
+}, { passive:true });
+onScroll();
+
+/* ---------------- kinetic hero heading ---------------- */
+const heroTitle = document.getElementById('heroTitle');
+const text = heroTitle.textContent;
+heroTitle.textContent = '';
+[...text].forEach((ch, i) => {
+  const span = document.createElement('span');
+  span.className = 'letter';
+  span.textContent = ch === ' ' ? '\u00A0' : ch;
+  span.style.transitionDelay = reduceMotion ? '0s' : `${i * 0.035}s`;
+  span.style.setProperty('--dur', (2.6 + Math.random()*1.6).toFixed(2)+'s');
+  span.style.setProperty('--bd', (Math.random()*2).toFixed(2)+'s');
+  heroTitle.appendChild(span);
+});
+requestAnimationFrame(() => {
+  const letters = heroTitle.querySelectorAll('.letter');
+  letters.forEach(l => l.classList.add('shown'));
+  if (!reduceMotion){
+    letters.forEach(l => {
+      l.addEventListener('transitionend', function handler(e){
+        if (e.propertyName === 'transform'){
+          l.classList.add('idle');
+          l.removeEventListener('transitionend', handler);
+        }
+      });
+    });
+  }
+});
+
+/* ---------------- stats count-up ---------------- */
+document.querySelectorAll('.stat .num').forEach(el => {
+  const target = parseFloat(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting){
+        if (reduceMotion){ el.textContent = target + suffix; io.unobserve(el); return; }
+        const start = performance.now();
+        const dur = 1300;
+        function tick(now){
+          const p = Math.min(1, (now - start) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.6 });
+  io.observe(el);
+});
+
+/* ---------------- marquee ticker content ---------------- */
+const SKILLS = ["Python","Django","Pandas","NumPy","SQL","REST APIs","Data Analytics","Full Stack","JavaScript","Forecasting"];
+const track = document.getElementById('tickerTrack');
+track.innerHTML = SKILLS.concat(SKILLS).map(s => `<span>${s}</span>`).join('');
+
+/* ---------------- experience cards ---------------- */
+const DATA = [
+  {when:"Present", org:"Lemon Technologies · RSM", role:"Python & Data Analytics Intern",
+   bullets:["Engineered production-grade software using Python, Django, and REST APIs",
+            "Built automated PDF parsing pipelines, cutting manual work by 60%+",
+            "Used Pandas and NumPy for analytics and cross-functional reporting",
+            "Contributed across the full SDLC, from architecture to deployment"],
+   tags:["Python","Django","SQL","Pandas"]},
+  {when:"Oct 2025 – Mar 2026", org:"TYCHR · Remote, India", role:"Content Creator",
+   bullets:["Created online notes for IB AI HL mathematics",
+            "Taught IB computer science through video lessons",
+            "Planned lessons using diverse strategies for varied student needs"],
+   tags:["IB Mathematics","Computer Science","Education"]},
+  {when:"Summer 2025", org:"Groww · Bengaluru", role:"Finance Intern",
+   bullets:["Analyzed market trends to support investment research",
+            "Built dashboards to track fund performance across sectors"],
+   tags:["Finance","Excel","Markets"]},
+  {when:"Summer 2024", org:"Samsonite · Data Science", role:"Data Science Intern",
+   bullets:["Cleaned and modeled retail datasets for demand forecasting",
+            "Presented findings to cross-functional stakeholders"],
+   tags:["Data Science","Python","Forecasting"]},
+  {when:"2025", org:"Ashoka Data Society", role:"Data Analyst",
+   bullets:["Delivered analysis for campus-wide research initiatives",
+            "Applied for Director of Research and Data Insights"],
+   tags:["Analytics","Research"]},
+  {when:"2025 – Present", org:"Ashoka Ministry of Technology", role:"Full Stack Developer",
+   bullets:["Built and maintained internal tools for student governance",
+            "Collaborated closely with a small full-stack team"],
+   tags:["Full Stack","Django","JavaScript"]},
+];
+
+const grid = document.getElementById('grid');
+DATA.forEach((d, i) => {
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.style.transitionDelay = reduceMotion ? '0s' : `${i * 0.08}s`;
+  card.innerHTML = `
+    <div class="num">${String(i+1).padStart(2,'0')}</div>
+    <div class="shine"></div>
+    <div class="card-head">
+      <span class="org">${d.org}</span>
+      <span class="when"><span class="dot"></span>${d.when}</span>
+    </div>
+    <h3>${d.role}</h3>
+    <ul>${d.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
+    <div class="tags">${d.tags.map(t => `<span>${t}</span>`).join('')}</div>
+  `;
+  grid.appendChild(card);
+});
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('.card').forEach(el => io.observe(el));
+
+if (!reduceMotion){
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      card.style.setProperty('--mx', (px*100)+'%');
+      card.style.setProperty('--my', (py*100)+'%');
+      card.style.transform = `rotateX(${(-(py-0.5) * 7).toFixed(2)}deg) rotateY(${((px-0.5) * 7).toFixed(2)}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateX(0deg) rotateY(0deg) translateY(0)';
+    });
+  });
+}
+
+
+
+</script>
+</body>
+</html>

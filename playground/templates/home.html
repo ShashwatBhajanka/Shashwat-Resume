@@ -1,130 +1,588 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Portfolio{% endblock %}
 {% block content %}
 
-<section id="hero" class="hero">
-  <div class="hero-accent reveal reveal-delay-1"></div>
-  {% if name %}
-  <h1 class="reveal reveal-delay-1">{{name}}</h1>
-  <p class="role reveal reveal-delay-2">
-    <span class="typewriter">Computer Science Student & Data Analyst</span>
-  </p>
-  {% else %}
-  <h1>Some Person</h1>
-  {% endif %}
-  <p class="tagline reveal reveal-delay-3">
-    Building at the intersection of <strong>data</strong>, <strong>code</strong>, and <strong>impact</strong>.
-    Aspiring data analyst with hands-on experience in analytics, web development, and research.
-    Passionate about turning raw information into meaningful insights and scalable solutions.
-  </p>
-  <div class="contact reveal reveal-delay-3">
-    <a href="mailto:bhajankashashwat@gmail.com">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      bhajankashashwat@gmail.com
-    </a>
-    <a href="https://linkedin.com/in/shashwat-bhajanka" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-      linkedin.com/in/shashwat-bhajanka
-    </a>
-    <a href="https://github.com/ShashwatBhajanka" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-      github.com/ShashwatBhajanka
-    </a>
-  </div>
-</section>
-
-<section class="overview section-card reveal reveal-delay-4">
-  <h2><span class="h2-icon">◈</span> Overview</h2>
-  <p class="overview-text">
-    Welcome to my digital notebook — a curated collection of my academic journey,
-    professional experience, technical skills, and the things I've built along the way.
-    Every entry here represents a chapter of growth, from classroom theory to real-world
-    impact. I thrive at the crossroads of data science, software engineering, and creative
-    problem-solving — always looking for the next challenge that blends analytical rigor
-    with tangible outcomes.
-  </p>
-  <div class="overview-stats">
-    <div class="stat">
-      <span class="stat-value">6+</span>
-      <span class="stat-label">Projects</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">4+</span>
-      <span class="stat-label">Years</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">6</span>
-      <span class="stat-label">Sections</span>
+<!-- ══════════════════════════════════════════════════════
+     HERO — full viewport, editorial
+══════════════════════════════════════════════════════ -->
+<section id="overview" class="hero-section">
+  <div class="hero">
+    <h1 class="reveal">
+      {% if name %}
+      <span class="highlight">{{name}}</span>
+      {% else %}
+      Portfolio
+      {% endif %}
+    </h1>
+    <p class="role reveal d1">Computer Science Student &amp; Data Analyst</p>
+    <p class="tagline reveal d2">
+      Building at the intersection of data, code, and impact.
+      Hands-on experience in analytics, web development, and research.
+    </p>
+    <div class="contact-row reveal d3">
+      <a class="contact-link" href="mailto:bhajankashashwat@gmail.com">Email</a>
+      <a class="contact-link" href="https://linkedin.com/in/shashwat-bhajanka" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="contact-link" href="https://github.com/ShashwatBhajanka" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 </section>
 
-<section class="explorer reveal reveal-delay-5">
-  <h2><span class="h2-icon">⟐</span> Explorer</h2>
-  <div class="explorer-grid">
+<hr class="editorial-divider" aria-hidden="true">
 
-    <a href="{% url 'education' %}" class="explorer-card">
-      <span class="card-line" style="background: var(--teal);"></span>
-      <span class="card-num">01</span>
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-      </svg>
-      <h3>Academic Trail</h3>
-      <p>Degrees, coursework & the making of a data mind.</p>
-      <span class="card-arrow">→</span>
-    </a>
+<!-- ══════════════════════════════════════════════════════
+     OVERVIEW
+══════════════════════════════════════════════════════ -->
+<section id="intro">
+  <div class="section-title-wrap reveal">
+    <p class="section-label">Introduction</p>
+    <h2 class="section-title">About Me</h2>
+  </div>
+  <div class="reveal d1">
+    <p class="intro-text">
+      Welcome to my digital notebook — a curated collection of my academic journey,
+      professional experience, technical skills, and the things I've built along the way.
+      Every entry here represents a chapter of growth, from classroom theory to real-world
+      impact. I thrive at the crossroads of data science, software engineering, and creative
+      problem-solving.
+    </p>
+    <div class="intro-stats stagger">
+      <div class="intro-stat reveal-s">
+        <div class="intro-stat-value" data-count="6+">0</div>
+        <div class="intro-stat-label">Projects</div>
+      </div>
+      <div class="intro-stat reveal-s">
+        <div class="intro-stat-value" data-count="4+">0</div>
+        <div class="intro-stat-label">Years of Experience</div>
+      </div>
+      <div class="intro-stat reveal-s">
+        <div class="intro-stat-value">6</div>
+        <div class="intro-stat-label">Sections</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <a href="{% url 'experience' %}" class="explorer-card">
-      <span class="card-line" style="background: var(--accent);"></span>
-      <span class="card-num">02</span>
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-      </svg>
-      <h3>Field Notes</h3>
-      <p>Internships, research & real-world analytics in action.</p>
-      <span class="card-arrow">→</span>
-    </a>
+<hr class="editorial-divider" aria-hidden="true">
 
-    <a href="{% url 'clubs' %}" class="explorer-card">
-      <span class="card-line" style="background: var(--teal);"></span>
-      <span class="card-num">03</span>
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      <h3>Guilds</h3>
-      <p>Student communities, leadership & collaborative builds.</p>
-      <span class="card-arrow">→</span>
-    </a>
+<!-- ══════════════════════════════════════════════════════
+     EDUCATION
+══════════════════════════════════════════════════════ -->
+<section id="education">
+  <div class="section-title-wrap reveal">
+    <p class="section-label">Education</p>
+    <h2 class="section-title">Academic Background</h2>
+  </div>
+  <p class="section-desc reveal d1">Coursework, grades, and the foundation of my analytical thinking.</p>
 
-    <a href="{% url 'skills' %}" class="explorer-card">
-      <span class="card-line" style="background: var(--accent);"></span>
-      <span class="card-num">04</span>
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="16 18 22 12 16 6"/>
-        <polyline points="8 6 2 12 8 18"/>
-      </svg>
-      <h3>Toolkit</h3>
-      <p>Languages, frameworks & everything in between.</p>
-      <span class="card-arrow">→</span>
-    </a>
+  <div class="edu-block reveal d2">
+    <div class="edu-row">
+      <span class="edu-school">Ashoka University</span>
+      <span class="edu-date">2025 — 2029</span>
+    </div>
+    <p class="edu-degree">BSc in Computer Science · Sonipat, India</p>
+    <div class="edu-courses">
+      <span class="edu-courses-label" style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;display:block;width:100%;margin-bottom:6px;">Relevant Coursework</span>
+      <div class="edu-chips">
+        <span class="chip">Quantitative &amp; Mathematical Reasoning <span class="grade">A−</span></span>
+        <span class="chip">Calculus</span>
+        <span class="chip">Intro to Computer Science <span class="grade">B+</span></span>
+        <span class="chip">Discrete Mathematics <span class="grade">A−</span></span>
+      </div>
+    </div>
+  </div>
 
-    <a href="{% url 'achievements' %}" class="explorer-card">
-      <span class="card-line" style="background: linear-gradient(90deg, var(--teal), var(--accent));"></span>
-      <span class="card-num">05</span>
-      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-      <h3>Milestones</h3>
-      <p>Certifications, awards & proof points along the way.</p>
-      <span class="card-arrow">→</span>
-    </a>
+  <div class="edu-block reveal d3">
+    <div class="edu-row">
+      <span class="edu-school">Fountainhead School</span>
+      <span class="edu-date">Graduated May 2025</span>
+    </div>
+    <p class="edu-degree">IB Diploma, score 37/45 · Surat, India</p>
+    <div class="edu-courses">
+      <span class="edu-courses-label" style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;display:block;width:100%;margin-bottom:6px;">Higher Level</span>
+      <div class="edu-chips">
+        <span class="chip">Mathematics AI HL <span class="grade">7/7</span></span>
+        <span class="chip">Computer Science HL <span class="grade">6/7</span></span>
+        <span class="chip">Economics HL <span class="grade">6/7</span></span>
+      </div>
+      <div class="edu-divider"><span>Standard Level</span></div>
+      <div class="edu-chips">
+        <span class="chip">Psychology SL <span class="grade">6/7</span></span>
+        <span class="chip">English SL <span class="grade">6/7</span></span>
+        <span class="chip">Hindi SL <span class="grade">6/7</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="editorial-divider" aria-hidden="true">
+
+<!-- ══════════════════════════════════════════════════════
+     EXPERIENCE — editorial timeline
+══════════════════════════════════════════════════════ -->
+<section id="experience">
+  <div class="section-title-wrap reveal">
+    <p class="section-label">Experience</p>
+    <h2 class="section-title">Where I've Worked</h2>
+  </div>
+  <p class="section-desc reveal d1">Real-world roles that shaped my approach to building and problem-solving.</p>
+
+  <div class="exp-list reveal d2">
+    <div class="exp-entry">
+      <div class="exp-meta">
+        <span class="exp-date">Present</span>
+        <span class="exp-org">Lemon Technologies · RSM</span>
+      </div>
+      <h3 class="exp-role">Python &amp; Data Analytics Intern</h3>
+      <ul class="exp-bullets">
+        <li>Engineered production-grade software using Python, Django, and RESTful APIs</li>
+        <li>Built automated PDF parsing pipelines reducing manual processing time by 60%+</li>
+        <li>Leveraged Pandas and NumPy for analytics and cross-functional reporting</li>
+        <li>Contributed across the full SDLC from architecture design to deployment</li>
+      </ul>
+      <div class="exp-tags">
+        <span class="exp-tag">Python</span><span class="exp-tag">Django</span><span class="exp-tag">SQL</span>
+        <span class="exp-tag">REST APIs</span><span class="exp-tag">Pandas</span>
+      </div>
+    </div>
+
+    <div class="exp-entry">
+      <div class="exp-meta">
+        <span class="exp-date">Oct 2025 — Mar 2026</span>
+        <span class="exp-org">TYCHR · Remote, India</span>
+      </div>
+      <h3 class="exp-role">Content Creator</h3>
+      <ul class="exp-bullets">
+        <li>Created online notes for IB AI HL mathematics and taught IB computer science through video</li>
+        <li>Planned lessons using diverse teaching strategies to meet varied student needs</li>
+      </ul>
+      <div class="exp-tags">
+        <span class="exp-tag">IB Mathematics</span><span class="exp-tag">Computer Science</span><span class="exp-tag">Education</span>
+      </div>
+    </div>
+
+    <div class="exp-entry">
+      <div class="exp-meta">
+        <span class="exp-date">Oct 2024 — Jan 2025</span>
+        <span class="exp-org">Research Labs</span>
+      </div>
+      <h3 class="exp-role">Internship Project</h3>
+      <ul class="exp-bullets">
+        <li>Launched an online self-checkout system reducing wait times via real-time data processing</li>
+        <li>Hit service time targets while understanding customer needs</li>
+      </ul>
+      <div class="exp-tags">
+        <span class="exp-tag">Cloud Architecture</span><span class="exp-tag">Real-time Systems</span>
+      </div>
+    </div>
+
+    <div class="exp-entry">
+      <div class="exp-meta">
+        <span class="exp-date">Aug 2024 — Sep 2024</span>
+        <span class="exp-org">Groww</span>
+      </div>
+      <h3 class="exp-role">Finance Intern</h3>
+      <ul class="exp-bullets">
+        <li>Analysed stocks and built portfolios for diverse demographics using predicted growth trends</li>
+        <li>Coordinated with team members on project management tasks</li>
+      </ul>
+      <div class="exp-tags">
+        <span class="exp-tag">Finance</span><span class="exp-tag">Portfolio Analysis</span><span class="exp-tag">Excel</span>
+      </div>
+    </div>
+
+    <div class="exp-entry">
+      <div class="exp-meta">
+        <span class="exp-date">Jul 2024 — Aug 2024</span>
+        <span class="exp-org">Samsonite</span>
+      </div>
+      <h3 class="exp-role">Data Science Intern</h3>
+      <ul class="exp-bullets">
+        <li>Developed a data-driven marketing strategy using Google Data Studio and Excel</li>
+      </ul>
+      <div class="exp-tags">
+        <span class="exp-tag">Data Studio</span><span class="exp-tag">Excel</span><span class="exp-tag">Marketing Analytics</span>
+      </div>
+    </div>
+
+    <div class="exp-entry">
+      <div class="exp-meta">
+        <span class="exp-date">Jun 2022 — Aug 2022</span>
+        <span class="exp-org">EcoVision</span>
+      </div>
+      <h3 class="exp-role">Systems and Consulting Intern</h3>
+      <ul class="exp-bullets">
+        <li>Provided sustainable plastic waste management solutions and ran social campaigns</li>
+      </ul>
+      <div class="exp-tags">
+        <span class="exp-tag">Sustainability</span><span class="exp-tag">Consulting</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="editorial-divider" aria-hidden="true">
+
+<!-- ══════════════════════════════════════════════════════
+     CLUBS
+══════════════════════════════════════════════════════ -->
+<section id="clubs">
+  <div class="section-title-wrap reveal">
+    <p class="section-label">Campus Life</p>
+    <h2 class="section-title">Communities &amp; Pursuits</h2>
+  </div>
+  <p class="section-desc reveal d1">Where code meets culture — leadership, art, and sport.</p>
+
+  <div class="club-grid reveal d2">
+    <div class="club-card">
+      <h3>Head of Dept — Research &amp; Data Insights</h3>
+      <p class="club-org">Ashoka Data Society</p>
+      <p class="club-desc">Lead independent research using university resources and varied data sources, publishing insights in a curated data review for the campus community.</p>
+      <div class="club-tags">
+        <span class="club-tag">Research</span><span class="club-tag">Data Analysis</span><span class="club-tag">Publishing</span>
+      </div>
+    </div>
+    <div class="club-card">
+      <h3>Full Stack Developer</h3>
+      <p class="club-org">Ashoka Ministry of Technology</p>
+      <p class="club-desc">Build and maintain university services used by 3,000+ students — applying web dev and analytics to identify real student needs.</p>
+      <div class="club-tags">
+        <span class="club-tag">Full Stack</span><span class="club-tag">3,000+ Users</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="extra-label reveal d3">Extracurriculars</p>
+  <div class="extra-grid stagger">
+    <div class="extra-item reveal-l">
+      <div>
+        <div class="extra-name">Ashoka Apple Cellos</div>
+        <div class="extra-org">Acapella Society · Ashoka University</div>
+      </div>
+      <span class="extra-badge">Present</span>
+    </div>
+    <div class="extra-item reveal-l">
+      <div>
+        <div class="extra-name">Ashoka Hammerheads</div>
+        <div class="extra-org">Frisbee Varsity Team · Ashoka University</div>
+      </div>
+      <span class="extra-badge">Present</span>
+    </div>
+  </div>
+</section>
+
+<hr class="editorial-divider" aria-hidden="true">
+
+<!-- ══════════════════════════════════════════════════════
+     SKILLS
+══════════════════════════════════════════════════════ -->
+<section id="skills">
+  <div class="section-title-wrap reveal">
+    <p class="section-label">Skills</p>
+    <h2 class="section-title">Technical Proficiency</h2>
+  </div>
+  <p class="section-desc reveal d1">Languages, tools, and competencies I bring to every project.</p>
+
+  <div class="reveal d2">
+
+    <div class="skills-group">
+      <div class="skills-label reveal-l">Programming</div>
+      <div class="stagger">
+        <div class="skill-row reveal-l">
+          <div class="skill-icon"><i class="devicon-python-plain colored"></i></div>
+          <div class="skill-info">
+            <div class="skill-name"><span>Python</span><span class="skill-level">Advanced</span></div>
+            <div class="skill-bar"><div class="skill-bar-fill" data-width="85"></div></div>
+          </div>
+        </div>
+        <div class="skill-row reveal-l">
+          <div class="skill-icon"><i class="devicon-mysql-plain colored"></i></div>
+          <div class="skill-info">
+            <div class="skill-name"><span>SQL</span><span class="skill-level">Proficient</span></div>
+            <div class="skill-bar"><div class="skill-bar-fill" data-width="78"></div></div>
+          </div>
+        </div>
+        <div class="skill-row reveal-l">
+          <div class="skill-icon"><i class="devicon-javascript-plain colored"></i></div>
+          <div class="skill-info">
+            <div class="skill-name"><span>JavaScript</span><span class="skill-level">Intermediate</span></div>
+            <div class="skill-bar"><div class="skill-bar-fill" data-width="60"></div></div>
+          </div>
+        </div>
+        <div class="skill-row reveal-l">
+          <div class="skill-icon"><i class="devicon-html5-plain colored"></i></div>
+          <div class="skill-info">
+            <div class="skill-name"><span>HTML / CSS</span><span class="skill-level">Proficient</span></div>
+            <div class="skill-bar"><div class="skill-bar-fill" data-width="80"></div></div>
+          </div>
+        </div>
+        <div class="skill-row reveal-l">
+          <div class="skill-icon"><i class="devicon-django-plain colored"></i></div>
+          <div class="skill-info">
+            <div class="skill-name"><span>Django</span><span class="skill-level">Intermediate</span></div>
+            <div class="skill-bar"><div class="skill-bar-fill" data-width="55"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-label reveal-l">Tools</div>
+      <div class="skill-chips stagger">
+        <span class="chip reveal-s"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/xd/xd-plain.svg" style="width:13px;height:13px;margin-right:4px;vertical-align:middle;" alt=""> Excel</span>
+        <span class="chip reveal-s"><img src="https://www.gstatic.com/analytics-suite/header/suite/v2/ga-icon-256.png" style="width:13px;height:13px;margin-right:4px;vertical-align:middle;border-radius:2px;" alt=""> Google Data Studio</span>
+        <span class="chip reveal-s"><i class="devicon-amazonwebservices-plain colored" style="font-size:14px;margin-right:4px;"></i> Cloud Architecture</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-label reveal-l">Competencies</div>
+      <div class="skill-chips stagger">
+        <span class="chip reveal-s">📊 Data Analysis</span>
+        <span class="chip reveal-s">📈 Statistical Modelling</span>
+        <span class="chip reveal-s">🧠 Analytical Thinking</span>
+        <span class="chip reveal-s">🔍 Critical Thinking</span>
+        <span class="chip reveal-s">📋 Project Management</span>
+        <span class="chip reveal-s">🤝 Team Collaboration</span>
+        <span class="chip reveal-s">💡 Problem Solving</span>
+      </div>
+    </div>
 
   </div>
 </section>
+
+<hr class="editorial-divider" aria-hidden="true">
+
+<!-- ══════════════════════════════════════════════════════
+     ACHIEVEMENTS
+══════════════════════════════════════════════════════ -->
+<section id="achievements">
+  <div class="section-title-wrap reveal">
+    <p class="section-label">Portfolio</p>
+    <h2 class="section-title">Achievements &amp; Certifications</h2>
+  </div>
+  <p class="section-desc reveal d1">Milestones, credentials, and proof points from the journey so far.</p>
+
+  <div class="reveal d2">
+    <p class="section-label" style="margin-bottom:12px;">🏅 Achievements</p>
+    <div class="ach-grid stagger">
+
+      <div class="ach-card ach-wide reveal-s" data-card="euclid">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🏅</span>
+          <span class="ach-title">Distinction, Euclid Mathematics Competition</span>
+          <span class="ach-year">2024</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">University of Waterloo (CEMC)</span>
+          <p class="ach-desc">Achieved a Distinction ranking in the Euclid Mathematics Contest, a competitive problem-solving exam covering algebra, geometry, and calculus.</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="trinity">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🎵</span>
+          <span class="ach-title">Trinity Piano &amp; Music Theory, Distinction – Grade 2</span>
+          <span class="ach-year">2023–24</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">Trinity College London</span>
+          <p class="ach-desc">Earned a Distinction in Grade 2 Piano and Music Theory examinations, demonstrating proficiency in performance and theoretical understanding.</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="award">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🥇</span>
+          <span class="ach-title">First Place, Inter-School Competition</span>
+          <span class="ach-year">2023</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[Organisation Name]</span>
+          <p class="ach-desc">[Describe what the competition involved and what you did to win first place.]</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="reveal d3" style="margin-top:36px;">
+    <p class="section-label" style="margin-bottom:12px;">📜 Certifications</p>
+    <div class="ach-grid stagger">
+
+      <div class="ach-card ach-wide reveal-s" data-card="ml">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🤖</span>
+          <span class="ach-title">Machine Learning Basics</span>
+          <span class="ach-year">2024</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[e.g. Coursera / DataCamp]</span>
+          <p class="ach-desc">[What you learned/built — e.g. supervised learning, regression, classification models.]</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="sql">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🗄️</span>
+          <span class="ach-title">SQL Programming</span>
+          <span class="ach-year">—</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[Organisation Name]</span>
+          <p class="ach-desc">[Describe the querying/database skills covered.]</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="python">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🐍</span>
+          <span class="ach-title">Python — 100 Days of Code</span>
+          <span class="ach-year">—</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">Udemy</span>
+          <p class="ach-desc">[Describe key projects or concepts from the 100 Days of Code course.]</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="finmath">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">💰</span>
+          <span class="ach-title">Financial Mathematics</span>
+          <span class="ach-year">—</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[Organisation Name]</span>
+          <p class="ach-desc">[Describe topics covered — e.g. interest rate models, valuation, risk.]</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="econom">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">📊</span>
+          <span class="ach-title">Econometrics</span>
+          <span class="ach-year">—</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[Organisation Name]</span>
+          <p class="ach-desc">[Describe statistical/modeling techniques covered.]</p>
+        </div>
+      </div>
+
+      <div class="ach-card reveal-s" data-card="datascience">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🔬</span>
+          <span class="ach-title">Data Science</span>
+          <span class="ach-year">—</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[Organisation Name]</span>
+          <p class="ach-desc">[Describe the data science skills/tools covered.]</p>
+        </div>
+      </div>
+
+      <div class="ach-card ach-wide reveal-s" data-card="entrepr">
+        <div class="ach-bg"></div><div class="ach-pattern"></div>
+        <div class="ach-front">
+          <span class="ach-icon">🚀</span>
+          <span class="ach-title">Entrepreneurship</span>
+          <span class="ach-year">—</span>
+        </div>
+        <div class="ach-back">
+          <span class="ach-org">[Organisation Name]</span>
+          <p class="ach-desc">[Describe what the entrepreneurship program/course covered.]</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .ach-card { cursor: pointer; }
+
+  /* .ach-front is already position:relative/z-index:1 from base.html and fills the card.
+     .ach-back needs the same absolute overlay treatment, or it just flows below
+     .ach-front and gets clipped by .ach-card's overflow:hidden. */
+  .ach-card .ach-back {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(145deg, var(--g-a) 0%, var(--g-b) 100%);
+    border-radius: inherit;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .ach-card .ach-front {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Works via click/tap on all devices; hover still works as a bonus on desktop */
+  .ach-card.is-open .ach-front,
+  .ach-card:hover .ach-front {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+  }
+  .ach-card.is-open .ach-back,
+  .ach-card:hover .ach-back {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .ach-org {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,.55);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .ach-desc {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #fff;
+    margin: 0;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('#achievements .ach-card').forEach(function (card) {
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-expanded', 'false');
+
+    function toggle() {
+      var isOpen = card.classList.toggle('is-open');
+      card.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
+    });
+  });
+</script>
 
 {% endblock %}
