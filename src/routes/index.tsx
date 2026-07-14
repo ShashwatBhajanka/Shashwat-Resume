@@ -160,7 +160,7 @@ const ACHIEVEMENTS: Array<{
     year: "2023–24",
     org: "Trinity College London",
     desc: "Earned a Distinction in Grade 2 Piano Practical and Music Theory examinations, demonstrating proficiency in performance and theoretical understanding.",
-    gradient: ["#1A0A2E", "#6D28D9"],
+    gradient: ["#180C2E", "#B14AED"],
   },
   {
     emoji: "🥇",
