@@ -40,4 +40,4 @@ staticfiles/
 dist/
 build/
 
-.agents/
+/.agents/
