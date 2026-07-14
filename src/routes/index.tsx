@@ -168,7 +168,7 @@ const ACHIEVEMENTS: Array<{
     year: "2023",
     org: "Fountainhead School",
     desc: "Represented Fountainhead School as band lead and lead singer, securing first place.",
-    gradient: ["#2A1500", "#B45309"],
+    gradient: ["#2A0F00", "#F59E0B"],
   },
 ];
 
