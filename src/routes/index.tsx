@@ -211,7 +211,7 @@ const CERTIFICATIONS: Array<{
     title: "Financial Mathematics",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#12103A", "#4F46E5"],
+    gradient: ["#0E0B33", "#6366F1"],
     isPlaceholder: true,
   },
   {
