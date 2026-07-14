@@ -27,9 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'shashwat-resume.vercel.app',  # Your specific Vercel URL
+feature
     '.vercel.app', 
     'localhost'               # Allows all Vercel subdomains (e.g., branch deployments)
-]
+
 
 
 # Application definition
