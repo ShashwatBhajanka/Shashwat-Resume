@@ -249,7 +249,7 @@ function CardFront({ emoji, title, year, isPlaceholder }: { emoji: string; title
         <div className="text-[15px] font-semibold leading-tight text-white">{title}</div>
         <div className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-white/70">
           <span>{year ?? ""}</span>
-          <span>{isPlaceholder ? "add details" : "tap to flip"}</span>
+          <span>{isPlaceholder ? "add details →" : "reveal →"}</span>
         </div>
       </div>
     </>
