@@ -235,7 +235,7 @@ const CERTIFICATIONS: Array<{
     title: "Entrepreneurship",
     org: "add organisation",
     desc: "Add details for this certification.",
-    gradient: ["#2A1000", "#C2410C"],
+    gradient: ["#2A0A00", "#F97316"],
     wide: true,
     isPlaceholder: true,
   },
