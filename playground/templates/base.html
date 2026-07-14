@@ -24,6 +24,7 @@
   --text-muted:  #555555;
   --accent:      #D4A574;
   --accent-dim:  rgba(212,165,116,.06);
+  --aurora-tint: rgba(212,165,116,.5);
   --radius:      6px;
   --nav-h:       48px;
   --max-w:       880px;
@@ -43,6 +44,7 @@
   --text-muted:  #9B9A94;
   --accent:      #8884D8;
   --accent-dim:  rgba(136,132,216,.07);
+  --aurora-tint: rgba(124,111,240,.4);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -68,71 +70,65 @@ body{
    BACKGROUND LAYERS (back → front)
 ═══════════════════════════════════════════════════════ */
 
-/* Layer 1: Static ambient orbs (always present, pre-positioned) */
-#ambient{
+/* Layer 1: Aurora — slow-flowing light ribbons, single accent hue only.
+   Alpha is baked directly into --aurora-tint rather than relying on
+   mix-blend-mode, since blend-mode + filter:blur on the same element
+   is unreliable across browsers and rendered invisible in light mode. */
+#aurora{
   position:fixed;inset:0;pointer-events:none;z-index:0;
   overflow:hidden;
+  filter:blur(80px);
 }
-#ambient .glow{
+[data-theme="light"] #aurora{
+  filter:blur(90px);
+}
+
+.aurora-band{
   position:absolute;
+  left:50%;top:50%;
+  width:170vw;height:60vh;
   border-radius:50%;
-  filter:blur(140px);
-  will-change:transform,opacity;
-}
-#ambient .glow:nth-child(1){
-  width:900px;height:900px;
-  background:rgba(245,245,240,.04);
-  top:-20%;left:-15%;
-  animation:lightDrift1 70s cubic-bezier(.45,.05,.1,1) infinite;
-}
-#ambient .glow:nth-child(2){
-  width:700px;height:700px;
-  background:rgba(200,200,195,.03);
-  bottom:-15%;right:-10%;
-  animation:lightDrift2 85s cubic-bezier(.5,.05,.1,1) infinite;
-}
-#ambient .glow:nth-child(3){
-  width:500px;height:500px;
-  background:rgba(255,255,250,.025);
-  top:30%;left:40%;
-  animation:lightDrift3 60s cubic-bezier(.4,.05,.15,1) infinite;
-}
-#ambient .glow:nth-child(4){
-  width:600px;height:600px;
-  background:rgba(180,180,175,.025);
-  top:55%;left:-8%;
-  animation:lightDrift4 75s cubic-bezier(.55,.05,.1,1) infinite;
-}
-[data-theme="light"] #ambient .glow:nth-child(1){background:rgba(136,132,216,.05);}
-[data-theme="light"] #ambient .glow:nth-child(2){background:rgba(136,132,216,.035);}
-[data-theme="light"] #ambient .glow:nth-child(3){background:rgba(200,200,255,.025);}
-[data-theme="light"] #ambient .glow:nth-child(4){background:rgba(136,132,216,.03);}
-
-@keyframes lightDrift1{
-  0%,100%{transform:translate(0,0) scale(1);opacity:1;}
-  25%{transform:translate(120px,-80px) scale(1.12);opacity:.85;}
-  50%{transform:translate(-60px,60px) scale(.88);opacity:.7;}
-  75%{transform:translate(80px,100px) scale(1.06);opacity:.9;}
-}
-@keyframes lightDrift2{
-  0%,100%{transform:translate(0,0) scale(1);opacity:1;}
-  33%{transform:translate(-140px,-100px) scale(1.15);opacity:.75;}
-  66%{transform:translate(70px,50px) scale(.92);opacity:.85;}
-}
-@keyframes lightDrift3{
-  0%,100%{transform:translate(0,0) scale(1);opacity:1;}
-  50%{transform:translate(100px,-60px) scale(1.08);opacity:.7;}
-}
-@keyframes lightDrift4{
-  0%,100%{transform:translate(0,0) scale(1);opacity:1;}
-  25%{transform:translate(-60px,80px) scale(.9);opacity:.8;}
-  75%{transform:translate(50px,-50px) scale(1.1);opacity:.65;}
+  background:radial-gradient(ellipse at center, var(--aurora-tint) 0%, transparent 68%);
+  will-change:transform,opacity,filter;
 }
 
-/* Layer 2: Interactive dot grid */
-#dotGrid{
-  position:fixed;inset:0;pointer-events:none;z-index:1;
-  width:100%;height:100%;
+.aurora-band.b1{
+  top:8%;
+  transform:translate(-50%,-50%) rotate(-9deg) scaleY(.8);
+  opacity:.9;
+  animation:auroraFlow1 7s ease-in-out infinite alternate;
+}
+.aurora-band.b2{
+  top:48%;
+  transform:translate(-50%,-50%) rotate(6deg) scaleY(.7);
+  opacity:.7;
+  animation:auroraFlow2 9s ease-in-out infinite alternate;
+}
+.aurora-band.b3{
+  top:86%;
+  transform:translate(-50%,-50%) rotate(-4deg) scaleY(.75);
+  opacity:.8;
+  animation:auroraFlow3 7s ease-in-out infinite alternate;
+}
+
+@keyframes auroraFlow1{
+  0%{  transform:translate(-58%,-52%) rotate(-9deg) scaleX(1)   scaleY(.8);}
+  50%{ transform:translate(-42%,-46%) rotate(-3deg) scaleX(1.12) scaleY(.95);}
+  100%{transform:translate(-50%,-58%) rotate(-13deg) scaleX(.94) scaleY(.75);}
+}
+@keyframes auroraFlow2{
+  0%{  transform:translate(-45%,-50%) rotate(6deg)  scaleX(1)   scaleY(.7);}
+  50%{ transform:translate(-56%,-42%) rotate(11deg) scaleX(1.15) scaleY(.85);}
+  100%{transform:translate(-48%,-56%) rotate(1deg)  scaleX(.9)  scaleY(.65);}
+}
+@keyframes auroraFlow3{
+  0%{  transform:translate(-52%,-48%) rotate(-4deg) scaleX(1)   scaleY(.75);}
+  50%{ transform:translate(-44%,-54%) rotate(-9deg) scaleX(1.1) scaleY(.9);}
+  100%{transform:translate(-58%,-44%) rotate(2deg)  scaleX(.92) scaleY(.68);}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .aurora-band{animation:none !important;}
 }
 
 /* Layer 3: Paper grain */
@@ -839,13 +835,11 @@ footer{
 </head>
 <body>
 
-<div id="ambient" aria-hidden="true">
-  <div class="glow"></div>
-  <div class="glow"></div>
-  <div class="glow"></div>
-  <div class="glow"></div>
+<div id="aurora" aria-hidden="true">
+  <div class="aurora-band b1"></div>
+  <div class="aurora-band b2"></div>
+  <div class="aurora-band b3"></div>
 </div>
-<canvas id="dotGrid" aria-hidden="true"></canvas>
 <div id="vignette" aria-hidden="true"></div>
 
 <nav id="navbar">
@@ -1000,77 +994,6 @@ footer{
   }
 
   onScroll();
-
-  /* ── Interactive dot grid ── */
-  var dotCanvas=document.getElementById('dotGrid');
-  if(dotCanvas){
-    var dCtx=dotCanvas.getContext('2d');
-    var dots=[],mouseX=-1e4,mouseY=-1e4,dt=0;
-    var dSpacing=44, dRad=3.5, dInfluence=140, dPush=28;
-
-    function resizeDots(){
-      dotCanvas.width=window.innerWidth;
-      dotCanvas.height=window.innerHeight;
-      dots=[];
-      var cols=Math.ceil(dotCanvas.width/dSpacing)+2;
-      var rows=Math.ceil(dotCanvas.height/dSpacing)+2;
-      for(var c=0;c<cols;c++){
-        for(var r=0;r<rows;r++){
-          var bx=c*dSpacing,by=r*dSpacing;
-          dots.push({bx:bx,by:by,x:bx,y:by});
-        }
-      }
-    }
-
-    document.addEventListener('mousemove',function(e){
-      mouseX=e.clientX;mouseY=e.clientY;
-    });
-    document.addEventListener('touchmove',function(e){
-      var t=e.touches[0];
-      if(t){mouseX=t.clientX;mouseY=t.clientY;}
-    },{passive:true});
-    document.addEventListener('touchend',function(){
-      mouseX=-1e4;mouseY=-1e4;
-    },{passive:true});
-
-    function drawDots(){
-      dt+=0.012;
-      var isLight=html.getAttribute('data-theme')==='light';
-      dCtx.clearRect(0,0,dotCanvas.width,dotCanvas.height);
-      dCtx.fillStyle=isLight?'rgba(0,0,0,0.09)':'rgba(255,255,255,0.075)';
-
-      var len=dots.length;
-      for(var i=0;i<len;i++){
-        var d=dots[i];
-        var dx=d.bx-mouseX, dy=d.by-mouseY;
-        var dist=Math.sqrt(dx*dx+dy*dy);
-        var ox=0,oy=0;
-
-        if(dist<dInfluence&&dist>0){
-          var force=1-dist/dInfluence;
-          var angle=Math.atan2(dy,dx);
-          var push=force*force*dPush;
-          ox=Math.cos(angle)*push;
-          oy=Math.sin(angle)*push;
-        }
-
-        var drift=Math.sin(dt+d.bx*0.008+d.by*0.008)*1.8;
-        var driftY=Math.cos(dt*0.7+d.bx*0.006+d.by*0.01)*1.2;
-
-        d.x=d.bx+ox+drift;
-        d.y=d.by+oy+driftY;
-
-        dCtx.beginPath();
-        dCtx.arc(d.x,d.y,dRad,0,Math.PI*2);
-        dCtx.fill();
-      }
-      requestAnimationFrame(drawDots);
-    }
-
-    window.addEventListener('resize',resizeDots);
-    resizeDots();
-    drawDots();
-  }
 })();
 </script>
 
