@@ -39,3 +39,5 @@ staticfiles/
 *.egg-info/
 dist/
 build/
+
+.agents/
