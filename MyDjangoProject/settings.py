@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-tj@62-ac!_81m-l0vpexr+8xnfxt43iv6w$*!+!pac7zk!kuye
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'shashwat-resume.vercel.app',  # Your specific Vercel URL
+    '.vercel.app',                # Allows all Vercel subdomains (e.g., branch deployments)
+]
 
 
 # Application definition
