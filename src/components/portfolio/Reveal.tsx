@@ -19,13 +19,9 @@ export function Reveal({
     <MotionTag
       ref={ref}
       className={className}
-      initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
-      animate={inView ? { opacity: 1, y: 0, filter: "blur(0px)" } : {}}
-      transition={{
-        duration: 0.9,
-        delay,
-        ease: [0.16, 1, 0.3, 1],
-      }}
+      initial={{ opacity: 0, y: 18 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </MotionTag>
