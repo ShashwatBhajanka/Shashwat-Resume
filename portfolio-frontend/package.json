@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:client": "vite build --config vite.client.config.ts",
+    "build:all": "rm -rf dist-client && vite build && vite build --config vite.client.config.ts && cp dist-client/client.js .output/public/client.js && cp dist-client/assets/* .output/public/assets/ && rm -f .output/public/assets/index-*.js .output/public/assets/routes-*.js && node scripts/generate-html.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",

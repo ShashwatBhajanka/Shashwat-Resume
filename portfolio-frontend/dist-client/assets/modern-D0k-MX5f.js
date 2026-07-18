@@ -1,0 +1,1 @@
+import{n as e,s as t,t as n}from"./jsx-runtime-DnlWeMvz.js";var r=t(e(),1),i=n(),a=r.createContext(void 0),o=({client:e,children:t})=>(r.useEffect(()=>(e.mount(),()=>{e.unmount()}),[e]),(0,i.jsx)(a.Provider,{value:e,children:t}));export{o as n,a as t};

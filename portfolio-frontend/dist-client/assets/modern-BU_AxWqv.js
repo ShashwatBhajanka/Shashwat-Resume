@@ -1,0 +1,1 @@
+import{n as e}from"./modern-D0k-MX5f.js";import"./router-DSIwI57G.js";export{e as QueryClientProvider};

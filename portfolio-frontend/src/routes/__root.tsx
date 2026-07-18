@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -33,6 +33,7 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
+  const [showDetail, setShowDetail] = useState(false);
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -42,7 +43,16 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold text-text">This page didn't load</h1>
         <p className="mt-2 text-sm text-text-soft">Something went wrong.</p>
-        <div className="mt-6 flex justify-center gap-2">
+        <p className="mt-1 text-xs text-text-muted">{error?.message || String(error)}</p>
+        {showDetail && (
+          <pre className="mt-4 max-h-96 overflow-auto rounded border border-border-soft bg-bg-elevated p-4 text-left text-xs text-text-soft">
+            {error?.stack || "No stack trace"}
+          </pre>
+        )}
+        <div className="mt-4 flex justify-center gap-2">
+          <button onClick={() => setShowDetail((v) => !v)} className="inline-flex items-center justify-center rounded-md border border-border-soft bg-bg-elevated px-4 py-2 text-xs font-medium text-text-soft">
+            {showDetail ? "Hide details" : "Show details"}
+          </button>
           <button
             onClick={() => { router.invalidate(); reset(); }}
             className="inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-bg"

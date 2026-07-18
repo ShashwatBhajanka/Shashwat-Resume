@@ -1,0 +1,1 @@
+import{o as e}from"./esm-5gBRq6cM.js";export{e as RouterProvider};
