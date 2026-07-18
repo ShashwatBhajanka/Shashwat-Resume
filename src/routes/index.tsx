@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/portfolio/Nav";
 import { HalftoneField } from "@/components/portfolio/HalftoneField";
@@ -178,6 +179,64 @@ function CardBack({ org, desc }: { org: string; desc: string }) {
       <div className="text-sm font-semibold text-text">{org}</div>
       <p className="mt-3 text-xs leading-relaxed text-text-soft">{desc}</p>
     </div>
+  );
+}
+
+function CarouselFlipCard({ card }: { card: Card }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen((o) => !o)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setOpen((o) => !o);
+        }
+      }}
+      aria-expanded={open}
+      className="relative block h-full w-full overflow-hidden text-left"
+    >
+      {/* Front */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{ background: `linear-gradient(135deg, ${card.gradient[0]}, ${card.gradient[1]})`, opacity: open ? 0 : 1 }}
+      />
+      <div
+        className="absolute inset-0 flex flex-col justify-between p-7 transition-all duration-500"
+        style={{ opacity: open ? 0 : 1 }}
+      >
+        <div className="text-4xl">{card.emoji}</div>
+        <div>
+          <div className="text-xl font-semibold leading-tight text-white display-tight">{card.title}</div>
+          <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-white/70">
+            <span>{card.year ?? ""}</span>
+            <span>{card.isPlaceholder ? "add details →" : "tap to reveal →"}</span>
+          </div>
+        </div>
+      </div>
+      {/* Back */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{ background: "var(--bg-elevated)", opacity: open ? 1 : 0 }}
+      />
+      <div
+        className="absolute inset-0 flex flex-col gap-4 p-7 transition-all duration-500"
+        style={{ opacity: open ? 1 : 0 }}
+      >
+        <div className="w-full">
+          <ImagePlaceholder aspect="16/9" />
+        </div>
+        <div className="flex flex-1 flex-col justify-between">
+          <div>
+            <div className="label-tag mb-1">Organisation</div>
+            <div className="text-sm font-semibold text-text">{card.org}</div>
+            <p className="mt-3 text-xs leading-relaxed text-text-soft">{card.desc}</p>
+          </div>
+          <div className="mt-2 self-end font-mono text-[9px] uppercase tracking-widest text-text-muted">← close</div>
+        </div>
+      </div>
+    </button>
   );
 }
 
