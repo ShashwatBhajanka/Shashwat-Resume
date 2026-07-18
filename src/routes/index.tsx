@@ -9,6 +9,7 @@ import { BackToTop } from "@/components/portfolio/BackToTop";
 import { ImagePlaceholder } from "@/components/portfolio/ImagePlaceholder";
 import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
 import { PinnedImageHeadline } from "@/components/portfolio/PinnedImageHeadline";
+import { Carousel3D } from "@/components/portfolio/Carousel3D";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -188,7 +189,7 @@ function Index() {
 
       {/* HERO — full bleed with halftone background */}
       <section id="home" className="relative">
-        <HalftoneField strength={0.7} className="min-h-[100svh]">
+        <HalftoneField strength={0.65} className="min-h-[100svh] hero-scrim">
           <div className="relative mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
             <Reveal>
               <div className="label-tag mb-6">Portfolio · 2026</div>
