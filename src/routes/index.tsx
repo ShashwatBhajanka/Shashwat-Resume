@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/portfolio/Nav";
 import { HalftoneField } from "@/components/portfolio/HalftoneField";
@@ -9,6 +10,7 @@ import { BackToTop } from "@/components/portfolio/BackToTop";
 import { ImagePlaceholder } from "@/components/portfolio/ImagePlaceholder";
 import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
 import { PinnedImageHeadline } from "@/components/portfolio/PinnedImageHeadline";
+import { Carousel3D } from "@/components/portfolio/Carousel3D";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -180,6 +182,64 @@ function CardBack({ org, desc }: { org: string; desc: string }) {
   );
 }
 
+function CarouselFlipCard({ card }: { card: Card }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen((o) => !o)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setOpen((o) => !o);
+        }
+      }}
+      aria-expanded={open}
+      className="relative block h-full w-full overflow-hidden text-left"
+    >
+      {/* Front */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{ background: `linear-gradient(135deg, ${card.gradient[0]}, ${card.gradient[1]})`, opacity: open ? 0 : 1 }}
+      />
+      <div
+        className="absolute inset-0 flex flex-col justify-between p-7 transition-all duration-500"
+        style={{ opacity: open ? 0 : 1 }}
+      >
+        <div className="text-4xl">{card.emoji}</div>
+        <div>
+          <div className="text-xl font-semibold leading-tight text-white display-tight">{card.title}</div>
+          <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-white/70">
+            <span>{card.year ?? ""}</span>
+            <span>{card.isPlaceholder ? "add details →" : "tap to reveal →"}</span>
+          </div>
+        </div>
+      </div>
+      {/* Back */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{ background: "var(--bg-elevated)", opacity: open ? 1 : 0 }}
+      />
+      <div
+        className="absolute inset-0 flex flex-col gap-4 p-7 transition-all duration-500"
+        style={{ opacity: open ? 1 : 0 }}
+      >
+        <div className="w-full">
+          <ImagePlaceholder aspect="16/9" />
+        </div>
+        <div className="flex flex-1 flex-col justify-between">
+          <div>
+            <div className="label-tag mb-1">Organisation</div>
+            <div className="text-sm font-semibold text-text">{card.org}</div>
+            <p className="mt-3 text-xs leading-relaxed text-text-soft">{card.desc}</p>
+          </div>
+          <div className="mt-2 self-end font-mono text-[9px] uppercase tracking-widest text-text-muted">← close</div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 function Index() {
   return (
     <div className="relative min-h-screen">
@@ -188,8 +248,8 @@ function Index() {
 
       {/* HERO — full bleed with halftone background */}
       <section id="home" className="relative">
-        <HalftoneField strength={0.7} className="min-h-[100svh]">
-          <div className="relative mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
+        <HalftoneField strength={0.65} className="min-h-[100svh] hero-scrim">
+          <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
             <Reveal>
               <div className="label-tag mb-6">Portfolio · 2026</div>
             </Reveal>
@@ -446,37 +506,23 @@ function Index() {
             </Reveal>
 
             <div className="mt-14">
-              <div className="label-tag mb-5">🏅 Achievements</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ACHIEVEMENTS.map((a, i) => (
-                  <Reveal key={i} delay={i * 0.05} className={a.wide ? "md:col-span-2" : ""}>
-                    <FlipCard
-                      gradient={a.gradient}
-                      wide={a.wide}
-                      front={<CardFront emoji={a.emoji} title={a.title} year={a.year} isPlaceholder={a.isPlaceholder} />}
-                      back={<CardBack org={a.org} desc={a.desc} />}
-                    />
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-12">
-              <div className="label-tag mb-5">📜 Certifications</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {CERTIFICATIONS.map((a, i) => (
-                  <Reveal key={i} delay={i * 0.04} className={a.wide ? "md:col-span-2" : ""}>
-                    <FlipCard
-                      gradient={a.gradient}
-                      wide={a.wide}
-                      front={<CardFront emoji={a.emoji} title={a.title} year={a.year} isPlaceholder={a.isPlaceholder} />}
-                      back={<CardBack org={a.org} desc={a.desc} />}
-                    />
-                  </Reveal>
-                ))}
-              </div>
+              <div className="label-tag mb-5">🏅 Achievements · scroll to advance</div>
             </div>
           </div>
+          <Carousel3D
+            items={ACHIEVEMENTS}
+            label="Achievements carousel"
+            renderCard={(a) => <CarouselFlipCard card={a} />}
+          />
+
+          <div className="mx-auto max-w-[1100px] px-5 md:px-8 pt-16">
+            <div className="label-tag mb-5">📜 Certifications · scroll to advance</div>
+          </div>
+          <Carousel3D
+            items={CERTIFICATIONS}
+            label="Certifications carousel"
+            renderCard={(a) => <CarouselFlipCard card={a} />}
+          />
         </section>
 
         {/* CLOSING CTA */}

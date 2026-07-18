@@ -110,3 +110,26 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Accessibility toggles applied on <html> */
+html.a11y-large { font-size: 112.5%; }
+html.a11y-contrast { --text-soft: var(--text); --text-muted: var(--text); }
+html.a11y-underline a { text-decoration: underline !important; text-underline-offset: 4px; }
+html.a11y-reduce *, html.a11y-reduce *::before, html.a11y-reduce *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Hero scrim overlay for shader legibility */
+.hero-scrim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--bg) 15%, transparent) 0%,
+    color-mix(in oklab, var(--bg) 40%, transparent) 60%,
+    color-mix(in oklab, var(--bg) 70%, transparent) 100%);
+  z-index: 1;
+}
