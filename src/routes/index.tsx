@@ -447,37 +447,23 @@ function Index() {
             </Reveal>
 
             <div className="mt-14">
-              <div className="label-tag mb-5">🏅 Achievements</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ACHIEVEMENTS.map((a, i) => (
-                  <Reveal key={i} delay={i * 0.05} className={a.wide ? "md:col-span-2" : ""}>
-                    <FlipCard
-                      gradient={a.gradient}
-                      wide={a.wide}
-                      front={<CardFront emoji={a.emoji} title={a.title} year={a.year} isPlaceholder={a.isPlaceholder} />}
-                      back={<CardBack org={a.org} desc={a.desc} />}
-                    />
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-12">
-              <div className="label-tag mb-5">📜 Certifications</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {CERTIFICATIONS.map((a, i) => (
-                  <Reveal key={i} delay={i * 0.04} className={a.wide ? "md:col-span-2" : ""}>
-                    <FlipCard
-                      gradient={a.gradient}
-                      wide={a.wide}
-                      front={<CardFront emoji={a.emoji} title={a.title} year={a.year} isPlaceholder={a.isPlaceholder} />}
-                      back={<CardBack org={a.org} desc={a.desc} />}
-                    />
-                  </Reveal>
-                ))}
-              </div>
+              <div className="label-tag mb-5">🏅 Achievements · scroll to advance</div>
             </div>
           </div>
+          <Carousel3D
+            items={ACHIEVEMENTS}
+            label="Achievements carousel"
+            renderCard={(a) => <CarouselFlipCard card={a} />}
+          />
+
+          <div className="mx-auto max-w-[1100px] px-5 md:px-8 pt-16">
+            <div className="label-tag mb-5">📜 Certifications · scroll to advance</div>
+          </div>
+          <Carousel3D
+            items={CERTIFICATIONS}
+            label="Certifications carousel"
+            renderCard={(a) => <CarouselFlipCard card={a} />}
+          />
         </section>
 
         {/* CLOSING CTA */}
