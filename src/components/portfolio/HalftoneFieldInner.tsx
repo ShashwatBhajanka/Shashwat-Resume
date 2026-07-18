@@ -35,6 +35,7 @@ const fragment = /* glsl */ `
   uniform float uTime;
   uniform vec2 uMouse;
   uniform float uMouseDown;
+  uniform float uMouseActive;
   uniform vec3 uBg;
   uniform vec3 uFg;
   uniform float uStrength;
@@ -70,7 +71,7 @@ const fragment = /* glsl */ `
     float a=0.5;
     for(int i=0;i<3;i++){
       s+=a*snoise(p);
-      p=p*2.02+vec2(uTime*0.05, -uTime*0.03);
+      p=p*2.02+vec2(uTime*0.04, -uTime*0.025);
       a*=0.5;
     }
     return s;
@@ -94,19 +95,31 @@ const fragment = /* glsl */ `
     vec2 frag = gl_FragCoord.xy;
     vec2 uv = (frag - 0.5 * uResolution) / uResolution.y;
 
-    // Cursor displacement — push noise coords outward when held
+    // Mouse in same normalized space
     vec2 mouseUv = (uMouse - 0.5 * uResolution) / uResolution.y;
     vec2 toM = uv - mouseUv;
     float d = length(toM);
-    float push = smoothstep(0.45, 0.0, d) * uMouseDown * 0.6;
-    vec2 warped = uv + normalize(toM + 1e-5) * push;
 
-    // Wide horizontal wave — stretch on x, compress on y
-    vec2 p = vec2(warped.x * 1.2, warped.y * 2.4);
-    float n = fbm(p * 1.4);
-    // remap to 0..1, shape into wave bias
-    float g = smoothstep(-0.9, 0.9, n);
-    g = mix(g, 1.0 - abs(warped.y * 1.8), 0.15);
+    // Always-on subtle ripple near cursor + amplified push on hold
+    float ambientPush = smoothstep(0.30, 0.0, d) * 0.12 * uMouseActive;
+    float heldPush = smoothstep(0.50, 0.0, d) * uMouseDown * 0.55;
+    vec2 dir = normalize(toM + 1e-5);
+    vec2 warped = uv + dir * (ambientPush + heldPush);
+
+    // Low-frequency wave: one or two peaks across viewport width
+    vec2 p = vec2(warped.x * 0.55, warped.y * 1.15);
+    float n = fbm(p);
+
+    // Shift threshold so most of frame is BELOW zero → low density,
+    // only crests rise up. Bias more with pow.
+    float g = smoothstep(0.15, 0.85, n);
+    g = pow(g, 1.8);
+
+    // Wave ripple driven by continuous mouse for feedback even w/o click
+    float ring = sin(d * 22.0 - uTime * 2.2) * 0.5 + 0.5;
+    float ringMask = smoothstep(0.35, 0.0, d) * uMouseActive * (0.10 + 0.35 * uMouseDown);
+    g += ring * ringMask * 0.35;
+
     g = clamp(g * uStrength, 0.0, 1.0);
 
     // Dot cell — quantize fragment to dot grid
@@ -126,11 +139,13 @@ function Quad({
   interactive,
   mouse,
   mouseDown,
+  mouseActive,
 }: {
   strength: number;
   interactive: boolean;
   mouse: React.MutableRefObject<{ x: number; y: number }>;
   mouseDown: React.MutableRefObject<number>;
+  mouseActive: React.MutableRefObject<number>;
 }) {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const { size } = useThree();
@@ -146,10 +161,11 @@ function Quad({
       uResolution: { value: new THREE.Vector2(1, 1) },
       uMouse: { value: new THREE.Vector2(-9999, -9999) },
       uMouseDown: { value: 0 },
+      uMouseActive: { value: 0 },
       uBg: { value: new THREE.Color("#0A0A0A") },
       uFg: { value: new THREE.Color("#EDEDED") },
       uStrength: { value: strength },
-      uDotSize: { value: 5.0 },
+      uDotSize: { value: 3.5 },
     }),
     [strength]
   );
@@ -158,15 +174,22 @@ function Quad({
     if (!mat.current) return;
     const u = mat.current.uniforms;
     if (!reduced) u.uTime.value += dt;
-    u.uResolution.value.set(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    u.uResolution.value.set(size.width * dpr, size.height * dpr);
     u.uBg.value.copy(colors.current.bg);
     u.uFg.value.copy(colors.current.fg);
-    // ease mouse down 0..1
-    const target = interactive ? mouseDown.current : 0;
-    u.uMouseDown.value += (target - u.uMouseDown.value) * 0.12;
-    u.uMouse.value.set(mouse.current.x * window.devicePixelRatio, (size.height - mouse.current.y) * window.devicePixelRatio);
-    u.uDotSize.value = window.innerWidth < 640 ? 6.0 : 5.0;
+    // ease mouseDown 0..1 (~300ms up / ~500ms down)
+    const target = mouseDown.current;
+    const speed = target > u.uMouseDown.value ? 0.14 : 0.08;
+    u.uMouseDown.value += (target - u.uMouseDown.value) * speed;
+    // ease continuous mouseActive presence
+    u.uMouseActive.value += (mouseActive.current - u.uMouseActive.value) * 0.12;
+    u.uMouse.value.set(mouse.current.x * dpr, (size.height - mouse.current.y) * dpr);
+    u.uDotSize.value = window.innerWidth < 640 ? 3.0 : 3.5;
   });
+
+  // silence unused warning
+  void interactive;
 
   return (
     <mesh>
@@ -185,6 +208,7 @@ export default function HalftoneFieldInner({
 }) {
   const mouse = useRef({ x: -9999, y: -9999 });
   const mouseDown = useRef(0);
+  const mouseActive = useRef(0);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -194,18 +218,24 @@ export default function HalftoneFieldInner({
       const r = el.getBoundingClientRect();
       mouse.current.x = e.clientX - r.left;
       mouse.current.y = e.clientY - r.top;
+      mouseActive.current = 1;
+    };
+    const onLeave = () => {
+      mouseActive.current = 0;
+      mouseDown.current = 0;
     };
     const onDown = () => { if (interactive) mouseDown.current = 1; };
     const onUp = () => { mouseDown.current = 0; };
-    el.addEventListener("pointermove", onMove);
+    // listen on window for pointermove so hero cursor drives shader across children
+    window.addEventListener("pointermove", onMove);
     el.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
-    el.addEventListener("pointerleave", onUp);
+    el.addEventListener("pointerleave", onLeave);
     return () => {
-      el.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
-      el.removeEventListener("pointerleave", onUp);
+      el.removeEventListener("pointerleave", onLeave);
     };
   }, [interactive]);
 
@@ -221,7 +251,7 @@ export default function HalftoneFieldInner({
         gl={{ antialias: false, alpha: false }}
         camera={{ position: [0, 0, 1] }}
       >
-        <Quad strength={strength} interactive={interactive} mouse={mouse} mouseDown={mouseDown} />
+        <Quad strength={strength} interactive={interactive} mouse={mouse} mouseDown={mouseDown} mouseActive={mouseActive} />
       </Canvas>
     </div>
   );
