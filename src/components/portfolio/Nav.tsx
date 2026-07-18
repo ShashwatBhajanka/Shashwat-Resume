@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import { A11yMenu } from "./A11yMenu";
 
 const SECTIONS = [
   { id: "home", label: "Home" },
@@ -90,6 +91,9 @@ export function Nav() {
           >
             {theme === "dark" ? <Sun size={13} /> : <Moon size={13} />}
           </button>
+          <div className="ml-1">
+            <A11yMenu />
+          </div>
         </div>
       </div>
     </nav>
