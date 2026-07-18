@@ -190,7 +190,7 @@ function Index() {
       {/* HERO — full bleed with halftone background */}
       <section id="home" className="relative">
         <HalftoneField strength={0.65} className="min-h-[100svh] hero-scrim">
-          <div className="relative mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
+          <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
             <Reveal>
               <div className="label-tag mb-6">Portfolio · 2026</div>
             </Reveal>
