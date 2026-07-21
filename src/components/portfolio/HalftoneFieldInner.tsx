@@ -71,24 +71,11 @@ const fragment = /* glsl */ `
     float a=0.5;
     for(int i=0;i<3;i++){
       s+=a*snoise(p);
-      p=p*2.02+vec2(uTime*0.04, -uTime*0.025);
+      // Much faster large-scale drift so the wave visibly travels
+      p=p*2.02+vec2(uTime*0.18, -uTime*0.12);
       a*=0.5;
     }
     return s;
-  }
-
-  // 8x8 Bayer matrix
-  float bayer(int x, int y){
-    int m[64];
-    m[0]=0; m[1]=32; m[2]=8; m[3]=40; m[4]=2; m[5]=34; m[6]=10; m[7]=42;
-    m[8]=48; m[9]=16; m[10]=56; m[11]=24; m[12]=50; m[13]=18; m[14]=58; m[15]=26;
-    m[16]=12; m[17]=44; m[18]=4; m[19]=36; m[20]=14; m[21]=46; m[22]=6; m[23]=38;
-    m[24]=60; m[25]=28; m[26]=52; m[27]=20; m[28]=62; m[29]=30; m[30]=54; m[31]=22;
-    m[32]=3; m[33]=35; m[34]=11; m[35]=43; m[36]=1; m[37]=33; m[38]=9; m[39]=41;
-    m[40]=51; m[41]=19; m[42]=59; m[43]=27; m[44]=49; m[45]=17; m[46]=57; m[47]=25;
-    m[48]=15; m[49]=47; m[50]=7; m[51]=39; m[52]=13; m[53]=45; m[54]=5; m[55]=37;
-    m[56]=63; m[57]=31; m[58]=55; m[59]=23; m[60]=61; m[61]=29; m[62]=53; m[63]=21;
-    return float(m[y*8+x])/64.0;
   }
 
   void main(){
@@ -100,25 +87,29 @@ const fragment = /* glsl */ `
     vec2 toM = uv - mouseUv;
     float d = length(toM);
 
-    // Always-on subtle ripple near cursor + amplified push on hold
-    float ambientPush = smoothstep(0.30, 0.0, d) * 0.12 * uMouseActive;
-    float heldPush = smoothstep(0.50, 0.0, d) * uMouseDown * 0.55;
+    // Ambient hover ripple: clearly visible under cursor
+    float ambientPush = smoothstep(0.35, 0.0, d) * 0.35 * uMouseActive;
+    // Hold: large, obvious outward push
+    float heldPush = smoothstep(0.90, 0.0, d) * uMouseDown * 1.6;
     vec2 dir = normalize(toM + 1e-5);
     vec2 warped = uv + dir * (ambientPush + heldPush);
 
-    // Low-frequency wave: one or two peaks across viewport width
-    vec2 p = vec2(warped.x * 0.55, warped.y * 1.15);
+    // Low-frequency wave, larger travelling amplitude
+    vec2 p = vec2(warped.x * 0.55, warped.y * 1.15) + vec2(uTime * 0.06, uTime * 0.03);
     float n = fbm(p);
 
-    // Shift threshold so most of frame is BELOW zero → low density,
-    // only crests rise up. Bias more with pow.
-    float g = smoothstep(0.15, 0.85, n);
-    g = pow(g, 1.8);
+    // Higher contrast between low-density and crest regions
+    float g = smoothstep(0.05, 0.75, n);
+    g = pow(g, 1.5);
 
-    // Wave ripple driven by continuous mouse for feedback even w/o click
-    float ring = sin(d * 22.0 - uTime * 2.2) * 0.5 + 0.5;
-    float ringMask = smoothstep(0.35, 0.0, d) * uMouseActive * (0.10 + 0.35 * uMouseDown);
-    g += ring * ringMask * 0.35;
+    // Wave ripple radiating from cursor — visible even without click
+    float ring = sin(d * 22.0 - uTime * 3.2) * 0.5 + 0.5;
+    float ringMask = smoothstep(0.55, 0.0, d) * uMouseActive * (0.25 + 0.75 * uMouseDown);
+    g += ring * ringMask * 0.65;
+
+    // Strong expanding shockwave on hold
+    float shock = smoothstep(0.90, 0.0, d) * uMouseDown;
+    g += shock * 0.45;
 
     g = clamp(g * uStrength, 0.0, 1.0);
 
