@@ -5,12 +5,12 @@ import { HalftoneField } from "@/components/portfolio/HalftoneField";
 import { Reveal } from "@/components/portfolio/Reveal";
 import { Counter } from "@/components/portfolio/Counter";
 import { SkillBar } from "@/components/portfolio/SkillBar";
-import { FlipCard } from "@/components/portfolio/FlipCard";
 import { BackToTop } from "@/components/portfolio/BackToTop";
 import { ImagePlaceholder } from "@/components/portfolio/ImagePlaceholder";
 import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
 import { PinnedImageHeadline } from "@/components/portfolio/PinnedImageHeadline";
 import { Carousel3D } from "@/components/portfolio/Carousel3D";
+import { ExperienceScroll } from "@/components/portfolio/ExperienceScroll";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -107,14 +107,19 @@ const PROGRAMMING = [
   { name: "Django", level: "Intermediate", pct: 65 },
 ];
 
+// Years of experience: earliest role start (Jun 2022) → now.
+const YEARS_OF_EXPERIENCE = Math.max(
+  0,
+  Math.floor((Date.now() - new Date("2022-06-01").getTime()) / (365.25 * 24 * 3600 * 1000))
+);
+
 type Card = {
   emoji: string;
   title: string;
   year?: string;
   org: string;
   desc: string;
-  gradient: [string, string];
-  wide?: boolean;
+  accent: string;
   isPlaceholder?: boolean;
 };
 
@@ -122,65 +127,40 @@ const ACHIEVEMENTS: Card[] = [
   { emoji: "🏅", title: "Distinction, Euclid Mathematics Competition", year: "2024",
     org: "University of Waterloo (CEMC)",
     desc: "Achieved a Distinction ranking in the Euclid Mathematics Contest, a competitive problem-solving exam covering algebra, geometry, and calculus.",
-    gradient: ["#0D2B2B", "#1A6B5A"], wide: true },
+    accent: "#1A6B5A" },
   { emoji: "🎵", title: "Trinity Piano & Music Theory, Distinction – Grade 2", year: "2023–24",
     org: "Trinity College London",
     desc: "Earned a Distinction in Grade 2 Piano Practical and Music Theory examinations, demonstrating proficiency in performance and theoretical understanding.",
-    gradient: ["#1A0A2E", "#6D28D9"] },
+    accent: "#6D28D9" },
   { emoji: "🥇", title: "First Place, Inter-School Competition", year: "2023",
     org: "Fountainhead School",
     desc: "Represented Fountainhead School as band lead and lead singer, securing first place.",
-    gradient: ["#2A1500", "#B45309"] },
+    accent: "#B45309" },
 ];
 
 const CERTIFICATIONS: Card[] = [
   { emoji: "🤖", title: "Machine Learning Basics", year: "2024", org: "Sung Kyun Kwan University",
     desc: "Completed an introductory course on Machine Learning. Learnt and practiced concepts such as supervised learning, regression, and classification models.",
-    gradient: ["#061828", "#0369A1"] },
+    accent: "#0369A1" },
   { emoji: "🗄️", title: "SQL Programming", year: "2024", org: "Udemy",
     desc: "Learnt advanced SQL techniques, including complex data querying, multi-table joins, and data merging to drive actionable insights.",
-    gradient: ["#0A2818", "#047857"] },
+    accent: "#047857" },
   { emoji: "🐍", title: "Python — 100 Days of Code", year: "2024", org: "Udemy",
     desc: "Add details for this certification.", isPlaceholder: true,
-    gradient: ["#1A1A00", "#B45309"] },
+    accent: "#B45309" },
   { emoji: "💰", title: "Financial Mathematics", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    gradient: ["#12103A", "#4F46E5"] },
+    accent: "#4F46E5" },
   { emoji: "📊", title: "Econometrics", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    gradient: ["#1A0A2E", "#7C3AED"] },
+    accent: "#7C3AED" },
   { emoji: "🔬", title: "Data Science", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    gradient: ["#003A4A", "#0891B2"] },
+    accent: "#0891B2" },
   { emoji: "🚀", title: "Entrepreneurship", org: "add organisation",
-    desc: "Add details for this certification.", isPlaceholder: true, wide: true,
-    gradient: ["#2A1000", "#C2410C"] },
+    desc: "Add details for this certification.", isPlaceholder: true,
+    accent: "#C2410C" },
 ];
-
-function CardFront({ emoji, title, year, isPlaceholder }: { emoji: string; title: string; year?: string; isPlaceholder?: boolean }) {
-  return (
-    <>
-      <div className="text-2xl">{emoji}</div>
-      <div>
-        <div className="text-[15px] font-semibold leading-tight text-white">{title}</div>
-        <div className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-white/70">
-          <span>{year ?? ""}</span>
-          <span>{isPlaceholder ? "add details →" : "tap to reveal →"}</span>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function CardBack({ org, desc }: { org: string; desc: string }) {
-  return (
-    <div>
-      <div className="label-tag mb-1">Organisation</div>
-      <div className="text-sm font-semibold text-text">{org}</div>
-      <p className="mt-3 text-xs leading-relaxed text-text-soft">{desc}</p>
-    </div>
-  );
-}
 
 function CarouselFlipCard({ card }: { card: Card }) {
   const [open, setOpen] = useState(false);
@@ -196,49 +176,147 @@ function CarouselFlipCard({ card }: { card: Card }) {
       }}
       aria-expanded={open}
       className="relative block h-full w-full overflow-hidden text-left"
+      style={{ background: "var(--bg-elevated)" }}
     >
+      {/* Top accent bar — the only place the accent gradient lives */}
+      <div
+        className="absolute inset-x-0 top-0 h-1"
+        style={{
+          background: `linear-gradient(90deg, ${card.accent}, color-mix(in oklab, ${card.accent} 40%, transparent))`,
+        }}
+      />
+
       {/* Front */}
       <div
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{ background: `linear-gradient(135deg, ${card.gradient[0]}, ${card.gradient[1]})`, opacity: open ? 0 : 1 }}
-      />
-      <div
-        className="absolute inset-0 flex flex-col justify-between p-7 transition-all duration-500"
+        className="absolute inset-0 flex flex-col p-6 transition-opacity duration-500"
         style={{ opacity: open ? 0 : 1 }}
       >
-        <div className="text-4xl">{card.emoji}</div>
-        <div>
-          <div className="text-xl font-semibold leading-tight text-white display-tight">{card.title}</div>
-          <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-white/70">
-            <span>{card.year ?? ""}</span>
-            <span>{card.isPlaceholder ? "add details →" : "tap to reveal →"}</span>
+        <div className="flex items-start justify-between">
+          <div
+            className="flex h-11 w-11 items-center justify-center border text-lg"
+            style={{
+              borderColor: "var(--border)",
+              background: `color-mix(in oklab, ${card.accent} 14%, transparent)`,
+            }}
+          >
+            {card.emoji}
+          </div>
+          {card.isPlaceholder ? (
+            <span
+              className="font-mono text-[9px] uppercase tracking-widest"
+              style={{ color: card.accent }}
+            >
+              placeholder
+            </span>
+          ) : (
+            <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
+              {card.year ?? ""}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-8">
+          <div className="label-tag mb-2">{card.org}</div>
+          <div className="text-[18px] font-semibold leading-tight text-text display-tight">
+            {card.title}
           </div>
         </div>
-      </div>
-      {/* Back */}
-      <div
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{ background: "var(--bg-elevated)", opacity: open ? 1 : 0 }}
-      />
-      <div
-        className="absolute inset-0 flex flex-col gap-4 p-7 transition-all duration-500"
-        style={{ opacity: open ? 1 : 0 }}
-      >
-        <div className="w-full">
+
+        <div className="mt-auto pt-6">
           <ImagePlaceholder aspect="16/9" />
         </div>
-        <div className="flex flex-1 flex-col justify-between">
-          <div>
-            <div className="label-tag mb-1">Organisation</div>
-            <div className="text-sm font-semibold text-text">{card.org}</div>
-            <p className="mt-3 text-xs leading-relaxed text-text-soft">{card.desc}</p>
-          </div>
-          <div className="mt-2 self-end font-mono text-[9px] uppercase tracking-widest text-text-muted">← close</div>
+
+        <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-text-muted">
+          <span>{card.isPlaceholder ? "add details" : "detail"}</span>
+          <span>tap to reveal →</span>
+        </div>
+      </div>
+
+      {/* Back */}
+      <div
+        className="absolute inset-0 flex flex-col p-6 transition-opacity duration-500"
+        style={{ opacity: open ? 1 : 0, background: "var(--bg-elevated)" }}
+      >
+        <div className="flex items-start justify-between">
+          <div className="label-tag">Organisation</div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
+            {card.year ?? ""}
+          </span>
+        </div>
+        <div className="mt-2 text-sm font-semibold text-text">{card.org}</div>
+        <div className="mt-4 text-[15px] font-semibold text-text display-tight leading-tight">
+          {card.title}
+        </div>
+        <p className="mt-4 text-xs leading-relaxed text-text-soft">{card.desc}</p>
+        <div className="mt-auto flex items-center justify-between pt-4">
+          <div
+            className="h-px flex-1 mr-4"
+            style={{ background: card.accent, opacity: 0.6 }}
+          />
+          <span className="font-mono text-[9px] uppercase tracking-widest text-text-muted">
+            ← close
+          </span>
         </div>
       </div>
     </button>
   );
 }
+
+type ClubCardData = {
+  role: string;
+  org: string;
+  desc: string;
+  tags: string[];
+  meta?: string;
+};
+
+function ClubCard({ c }: { c: ClubCardData }) {
+  return (
+    <div className="h-full border p-6" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+      <ImagePlaceholder aspect="16/9" />
+      <div className="mt-5 flex items-center justify-between">
+        <div className="label-tag">{c.org}</div>
+        {c.meta && (
+          <div className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
+            {c.meta}
+          </div>
+        )}
+      </div>
+      <div className="mt-2 text-lg font-semibold text-text display-tight">{c.role}</div>
+      <p className="mt-3 text-sm leading-relaxed text-text-soft">{c.desc}</p>
+      <div className="mt-4 flex flex-wrap gap-1.5">{c.tags.map((t) => <Chip key={t}>{t}</Chip>)}</div>
+    </div>
+  );
+}
+
+const CLUBS: ClubCardData[] = [
+  {
+    role: "Head of Dept — Research & Data Insights",
+    org: "Ashoka Data Society",
+    desc: "Lead independent research using university resources and varied data sources, publishing insights in a curated data review for the campus community.",
+    tags: ["Research", "Data Analysis", "Publishing"],
+  },
+  {
+    role: "Full Stack Developer",
+    org: "Ashoka Ministry of Technology",
+    desc: "Build and maintain university services used by 3,000+ students — applying web dev and analytics to identify real student needs.",
+    tags: ["Full Stack", "3,000+ Users"],
+  },
+  {
+    role: "Vocalist",
+    org: "Ashoka Apple Cellos",
+    desc: "Member of the university's acapella society, performing at campus events and inter-college showcases.",
+    tags: ["Acapella", "Performance"],
+    meta: "Present",
+  },
+  {
+    role: "Varsity Player",
+    org: "Ashoka Hammerheads",
+    desc: "Represent Ashoka University on the Ultimate Frisbee varsity team across regional tournaments.",
+    tags: ["Frisbee", "Varsity"],
+    meta: "Present",
+  },
+];
 
 function Index() {
   return (
@@ -246,9 +324,9 @@ function Index() {
       <Nav />
       <BackToTop />
 
-      {/* HERO — full bleed with halftone background */}
+      {/* HERO */}
       <section id="home" className="relative">
-        <HalftoneField strength={0.65} className="min-h-[100svh] hero-scrim">
+        <HalftoneField strength={0.75} className="min-h-[100svh] hero-scrim">
           <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
             <Reveal>
               <div className="label-tag mb-6">Portfolio · 2026</div>
@@ -300,15 +378,25 @@ function Index() {
           <Reveal delay={0.2}>
             <div className="mt-16 grid grid-cols-3 gap-4 border-t pt-10" style={{ borderColor: "var(--border)" }}>
               {[
-                { n: 0, label: "Projects" },
-                { n: 0, label: "Years of Experience" },
-                { n: 6, label: "Sections" },
+                { n: null, label: "Projects", note: "placeholder" },
+                { n: YEARS_OF_EXPERIENCE, label: "Years of Experience" },
+                { n: EXPERIENCE.length, label: "Roles Held" },
               ].map((s, i) => (
                 <div key={i} className="border-l pl-5 first:border-l-0 first:pl-0" style={{ borderColor: "var(--border)" }}>
                   <div className="display-tight text-text" style={{ fontSize: "clamp(48px, 8vw, 96px)" }}>
-                    <Counter to={s.n} />
+                    {s.n === null ? <span className="text-text-muted">—</span> : <Counter to={s.n} />}
                   </div>
-                  <div className="mt-3 label-tag">{s.label}</div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="label-tag">{s.label}</span>
+                    {s.note && (
+                      <span
+                        className="font-mono text-[9px] uppercase tracking-widest"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        · {s.note}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -331,28 +419,33 @@ function Index() {
           </Reveal>
           <div className="mt-16 space-y-14">
             {EDUCATION.map((e, i) => (
-              <Reveal key={i} delay={i * 0.05}>
+              <Reveal key={i} delay={i * 0.08}>
                 <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-10 border-t pt-8" style={{ borderColor: "var(--border)" }}>
                   <div className="font-mono text-[11px] uppercase tracking-widest text-text-muted">{e.date}</div>
-                  <div>
-                    <div className="text-2xl md:text-3xl font-semibold text-text display-tight">{e.school}</div>
-                    <div className="mt-2 text-sm text-text-soft">{e.degree}</div>
-                    {"chips" in e && e.chips ? (
-                      <div className="mt-6">
-                        <div className="label-tag mb-3">{e.group}</div>
-                        <div className="flex flex-wrap gap-1.5">{e.chips.map((c) => <Chip key={c}>{c}</Chip>)}</div>
-                      </div>
-                    ) : null}
-                    {"groups" in e && e.groups ? (
-                      <div className="mt-6 space-y-4">
-                        {e.groups.map((g) => (
-                          <div key={g.label}>
-                            <div className="label-tag mb-3">{g.label}</div>
-                            <div className="flex flex-wrap gap-1.5">{g.chips.map((c) => <Chip key={c}>{c}</Chip>)}</div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
+                  <div className="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-6">
+                    <div className="w-40">
+                      <ImagePlaceholder aspect="1/1" />
+                    </div>
+                    <div>
+                      <div className="text-2xl md:text-3xl font-semibold text-text display-tight">{e.school}</div>
+                      <div className="mt-2 text-sm text-text-soft">{e.degree}</div>
+                      {"chips" in e && e.chips ? (
+                        <div className="mt-6">
+                          <div className="label-tag mb-3">{e.group}</div>
+                          <div className="flex flex-wrap gap-1.5">{e.chips.map((c) => <Chip key={c}>{c}</Chip>)}</div>
+                        </div>
+                      ) : null}
+                      {"groups" in e && e.groups ? (
+                        <div className="mt-6 space-y-4">
+                          {e.groups.map((g) => (
+                            <div key={g.label}>
+                              <div className="label-tag mb-3">{g.label}</div>
+                              <div className="flex flex-wrap gap-1.5">{g.chips.map((c) => <Chip key={c}>{c}</Chip>)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </Reveal>
@@ -362,35 +455,14 @@ function Index() {
 
         <Divider />
 
-        {/* EXPERIENCE */}
+        {/* EXPERIENCE — pinned scrollytelling */}
         <section id="experience" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Experience</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>Where I've Worked</H2></Reveal>
           <Reveal delay={0.1}>
             <p className="mt-5 max-w-[560px] text-sm text-text-soft">Real-world roles that shaped my approach to building and problem-solving.</p>
           </Reveal>
-          <div className="mt-16 space-y-0">
-            {EXPERIENCE.map((x, i) => (
-              <Reveal key={i} delay={i * 0.03}>
-                <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-10 border-t py-10" style={{ borderColor: "var(--border)" }}>
-                  <div className="font-mono text-[11px] uppercase tracking-widest text-text-muted">{x.date}</div>
-                  <div>
-                    <div className="text-sm" style={{ color: "var(--accent)" }}>{x.org}</div>
-                    <div className="mt-1 text-2xl md:text-3xl font-semibold text-text display-tight">{x.role}</div>
-                    <ul className="mt-4 space-y-1.5 text-[15px] text-text-soft">
-                      {x.bullets.map((b) => (
-                        <li key={b} className="relative pl-5">
-                          <span className="absolute left-0 top-3 h-px w-3 bg-text-muted" />
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-4 flex flex-wrap gap-1.5">{x.tags.map((t) => <Chip key={t}>{t}</Chip>)}</div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+          <ExperienceScroll entries={EXPERIENCE} />
         </section>
 
         <Divider />
@@ -403,42 +475,12 @@ function Index() {
             <p className="mt-5 max-w-[560px] text-sm text-text-soft">Where code meets culture — leadership, art, and sport.</p>
           </Reveal>
           <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              { role: "Head of Dept — Research & Data Insights", org: "Ashoka Data Society",
-                desc: "Lead independent research using university resources and varied data sources, publishing insights in a curated data review for the campus community.",
-                tags: ["Research", "Data Analysis", "Publishing"] },
-              { role: "Full Stack Developer", org: "Ashoka Ministry of Technology",
-                desc: "Build and maintain university services used by 3,000+ students — applying web dev and analytics to identify real student needs.",
-                tags: ["Full Stack", "3,000+ Users"] },
-            ].map((c, i) => (
-              <Reveal key={i} delay={i * 0.05}>
-                <div className="h-full border p-6" style={{ borderColor: "var(--border)" }}>
-                  <ImagePlaceholder aspect="16/9" />
-                  <div className="mt-5 label-tag">{c.org}</div>
-                  <div className="mt-2 text-lg font-semibold text-text display-tight">{c.role}</div>
-                  <p className="mt-3 text-sm leading-relaxed text-text-soft">{c.desc}</p>
-                  <div className="mt-4 flex flex-wrap gap-1.5">{c.tags.map((t) => <Chip key={t}>{t}</Chip>)}</div>
-                </div>
+            {CLUBS.map((c, i) => (
+              <Reveal key={c.org} delay={i * 0.08}>
+                <ClubCard c={c} />
               </Reveal>
             ))}
           </div>
-          <Reveal delay={0.15}>
-            <div className="mt-14">
-              <div className="label-tag mb-4">Extracurriculars</div>
-              <ul className="border-t" style={{ borderColor: "var(--border)" }}>
-                {[
-                  { name: "Ashoka Apple Cellos", desc: "Acapella Society · Ashoka University" },
-                  { name: "Ashoka Hammerheads", desc: "Frisbee Varsity Team · Ashoka University" },
-                ].map((x) => (
-                  <li key={x.name} className="grid grid-cols-[80px_1fr_auto] items-center gap-4 border-b py-4" style={{ borderColor: "var(--border)" }}>
-                    <div className="w-16"><ImagePlaceholder aspect="1/1" label="" /></div>
-                    <div className="text-sm text-text-soft"><span className="text-text font-semibold">{x.name}</span> — {x.desc}</div>
-                    <span className="font-mono text-[11px] text-text-muted">Present</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
         </section>
 
         <Divider />
@@ -486,9 +528,8 @@ function Index() {
 
         {/* ACHIEVEMENTS */}
         <section id="achievements" className="relative">
-          {/* Subtle halftone behind header only */}
           <div className="relative">
-            <HalftoneField strength={0.5} className="h-[360px]">
+            <HalftoneField strength={0.6} className="h-[360px]">
               <div className="relative mx-auto flex h-full max-w-[1100px] flex-col justify-end px-5 pb-14 md:px-8">
                 <Reveal><SectionLabel>Portfolio</SectionLabel></Reveal>
                 <Reveal delay={0.05}>
