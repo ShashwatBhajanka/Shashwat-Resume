@@ -1,5 +1,5 @@
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Reveal } from "./Reveal";
 
 export type ExperienceEntry = {
@@ -83,22 +83,30 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
   const reduced = useReducedMotion();
   const isDesktop = useIsDesktop();
   const wrapRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: wrapRef,
-    offset: ["start start", "end end"],
-  });
+  const [progress, setProgress] = useState(0);
 
   const N = entries.length;
-  const [active, setActive] = useState(0);
-  const progressScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  const updateProgress = useCallback(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    if (total <= 0) {
+      setProgress(0);
+      return;
+    }
+    const scrolled = -rect.top;
+    setProgress(Math.min(1, Math.max(0, scrolled / total)));
+  }, []);
 
   useEffect(() => {
-    return scrollYProgress.on("change", (v) => {
-      // divide scroll into N segments; last segment holds final entry
-      const idx = Math.min(N - 1, Math.max(0, Math.floor(v * N * 0.999)));
-      setActive(idx);
-    });
-  }, [scrollYProgress, N]);
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+    return () => window.removeEventListener("scroll", updateProgress);
+  }, [updateProgress]);
+
+  const active = Math.min(N - 1, Math.max(0, Math.floor(progress * N * 0.999)));
 
   if (!isDesktop || reduced) {
     return <TimelineFallback entries={entries} />;
@@ -132,7 +140,7 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
             >
               <motion.div
                 className="absolute left-0 top-0 w-px origin-top"
-                style={{ height: "100%", background: "var(--accent)", scaleY: progressScaleY }}
+                style={{ height: "100%", background: "var(--accent)", scaleY: progress }}
               />
               {entries.map((_, i) => (
                 <div

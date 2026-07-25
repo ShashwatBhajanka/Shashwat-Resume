@@ -78,6 +78,19 @@ const fragment = /* glsl */ `
     return s;
   }
 
+  // Bayer 8×8 ordered dither threshold (recursive, no array needed)
+  float threshold(ivec2 p, float v) {
+    ivec2 lo = p & 1;
+    ivec2 md = (p >> 1) & 1;
+    ivec2 hi = (p >> 2) & 1;
+    float t = float(
+      (lo.x==0 ? (lo.y==0 ? 0:3) : (lo.y==0 ? 2:1)) +
+      ((md.x==0 ? (md.y==0 ? 0:3) : (md.y==0 ? 2:1)) << 2) +
+      ((hi.x==0 ? (hi.y==0 ? 0:3) : (hi.y==0 ? 2:1)) << 4)
+    ) / 64.0;
+    return step(t, v);
+  }
+
   void main(){
     vec2 frag = gl_FragCoord.xy;
     vec2 uv = (frag - 0.5 * uResolution) / uResolution.y;
@@ -115,10 +128,7 @@ const fragment = /* glsl */ `
 
     // Dot cell — quantize fragment to dot grid
     vec2 cell = floor(frag / uDotSize);
-    int bx = int(mod(cell.x, 8.0));
-    int by = int(mod(cell.y, 8.0));
-    float t = bayer(bx, by);
-    float dither = step(t, g);
+    float dither = threshold(ivec2(cell), g);
 
     vec3 col = mix(uBg, uFg, dither);
     gl_FragColor = vec4(col, 1.0);
