@@ -2,5 +2,6 @@
   "framework": null,
   "buildCommand": "bun run build",
   "installCommand": "bun install",
-  "devCommand": "bun run dev"
+  "devCommand": "bun run dev",
+  "outputDirectory": "dist"
 }

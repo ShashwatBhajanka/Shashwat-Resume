@@ -4,9 +4,8 @@ import { useRef } from "react";
 function Word({ children, progress, range }: { children: string; progress: any; range: [number, number] }) {
   const opacity = useTransform(progress, range, [0.18, 1]);
   return (
-    <motion.span style={{ opacity }} className="inline-block">
-      {children}
-      <span> </span>
+    <motion.span style={{ opacity }} className="inline">
+      {children}{' '}
     </motion.span>
   );
 }

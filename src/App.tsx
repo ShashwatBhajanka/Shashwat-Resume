@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/portfolio/Nav";
 import { HalftoneField } from "@/components/portfolio/HalftoneField";
 import { Reveal } from "@/components/portfolio/Reveal";
@@ -11,8 +10,6 @@ import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
 import { PinnedImageHeadline } from "@/components/portfolio/PinnedImageHeadline";
 import { Carousel3D } from "@/components/portfolio/Carousel3D";
 import { ExperienceScroll } from "@/components/portfolio/ExperienceScroll";
-
-export const Route = createFileRoute("/")({ component: Index });
 
 function SectionLabel({ children }: { children: string }) {
   return <div className="label-tag mb-4">{children}</div>;
@@ -107,7 +104,6 @@ const PROGRAMMING = [
   { name: "Django", level: "Intermediate", pct: 65 },
 ];
 
-// Years of experience: earliest role start (Jun 2022) → now.
 const YEARS_OF_EXPERIENCE = Math.max(
   0,
   Math.floor((Date.now() - new Date("2022-06-01").getTime()) / (365.25 * 24 * 3600 * 1000))
@@ -178,15 +174,12 @@ function CarouselFlipCard({ card }: { card: Card }) {
       className="relative block h-full w-full overflow-hidden text-left"
       style={{ background: "var(--bg-elevated)" }}
     >
-      {/* Top accent bar — the only place the accent gradient lives */}
       <div
         className="absolute inset-x-0 top-0 h-1"
         style={{
           background: `linear-gradient(90deg, ${card.accent}, color-mix(in oklab, ${card.accent} 40%, transparent))`,
         }}
       />
-
-      {/* Front */}
       <div
         className="absolute inset-0 flex flex-col p-6 transition-opacity duration-500"
         style={{ opacity: open ? 0 : 1 }}
@@ -202,10 +195,7 @@ function CarouselFlipCard({ card }: { card: Card }) {
             {card.emoji}
           </div>
           {card.isPlaceholder ? (
-            <span
-              className="font-mono text-[9px] uppercase tracking-widest"
-              style={{ color: card.accent }}
-            >
+            <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: card.accent }}>
               placeholder
             </span>
           ) : (
@@ -214,25 +204,20 @@ function CarouselFlipCard({ card }: { card: Card }) {
             </span>
           )}
         </div>
-
         <div className="mt-8">
           <div className="label-tag mb-2">{card.org}</div>
           <div className="text-[18px] font-semibold leading-tight text-text display-tight">
             {card.title}
           </div>
         </div>
-
         <div className="mt-auto pt-6">
           <ImagePlaceholder aspect="16/9" />
         </div>
-
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-text-muted">
           <span>{card.isPlaceholder ? "add details" : "detail"}</span>
           <span>tap to reveal →</span>
         </div>
       </div>
-
-      {/* Back */}
       <div
         className="absolute inset-0 flex flex-col p-6 transition-opacity duration-500"
         style={{ opacity: open ? 1 : 0, background: "var(--bg-elevated)" }}
@@ -249,10 +234,7 @@ function CarouselFlipCard({ card }: { card: Card }) {
         </div>
         <p className="mt-4 text-xs leading-relaxed text-text-soft">{card.desc}</p>
         <div className="mt-auto flex items-center justify-between pt-4">
-          <div
-            className="h-px flex-1 mr-4"
-            style={{ background: card.accent, opacity: 0.6 }}
-          />
+          <div className="h-px flex-1 mr-4" style={{ background: card.accent, opacity: 0.6 }} />
           <span className="font-mono text-[9px] uppercase tracking-widest text-text-muted">
             ← close
           </span>
@@ -318,13 +300,12 @@ const CLUBS: ClubCardData[] = [
   },
 ];
 
-function Index() {
+export function App() {
   return (
     <div className="relative min-h-screen">
       <Nav />
       <BackToTop />
 
-      {/* HERO */}
       <section id="home" className="relative">
         <HalftoneField strength={0.75} className="min-h-[100svh] hero-scrim">
           <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
@@ -368,7 +349,6 @@ function Index() {
       </section>
 
       <main className="relative">
-        {/* ABOUT */}
         <section id="overview" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Introduction</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>About Me</H2></Reveal>
@@ -389,10 +369,7 @@ function Index() {
                   <div className="mt-3 flex items-center gap-2">
                     <span className="label-tag">{s.label}</span>
                     {s.note && (
-                      <span
-                        className="font-mono text-[9px] uppercase tracking-widest"
-                        style={{ color: "var(--accent)" }}
-                      >
+                      <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: "var(--accent)" }}>
                         · {s.note}
                       </span>
                     )}
@@ -404,13 +381,9 @@ function Index() {
         </section>
 
         <Divider />
-
-        {/* PINNED IMAGE HEADLINE */}
         <PinnedImageHeadline />
-
         <Divider />
 
-        {/* EDUCATION */}
         <section id="education" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Education</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>Academic Background</H2></Reveal>
@@ -455,7 +428,6 @@ function Index() {
 
         <Divider />
 
-        {/* EXPERIENCE — pinned scrollytelling */}
         <section id="experience" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Experience</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>Where I've Worked</H2></Reveal>
@@ -467,7 +439,6 @@ function Index() {
 
         <Divider />
 
-        {/* CLUBS */}
         <section id="clubs" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Campus Life</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>Communities &amp; Pursuits</H2></Reveal>
@@ -485,7 +456,6 @@ function Index() {
 
         <Divider />
 
-        {/* SKILLS */}
         <section id="skills" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Skills</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>Technical Proficiency</H2></Reveal>
@@ -526,7 +496,6 @@ function Index() {
 
         <Divider />
 
-        {/* ACHIEVEMENTS */}
         <section id="achievements" className="relative">
           <div className="relative">
             <HalftoneField strength={0.6} className="h-[360px]">
@@ -540,12 +509,10 @@ function Index() {
               </div>
             </HalftoneField>
           </div>
-
           <div className="mx-auto max-w-[1100px] px-5 md:px-8 py-16 md:py-24">
             <Reveal delay={0.1}>
               <p className="max-w-[560px] text-sm text-text-soft">Milestones, credentials, and proof points from the journey so far.</p>
             </Reveal>
-
             <div className="mt-14">
               <div className="label-tag mb-5">🏅 Achievements · scroll to advance</div>
             </div>
@@ -555,7 +522,6 @@ function Index() {
             label="Achievements carousel"
             renderCard={(a) => <CarouselFlipCard card={a} />}
           />
-
           <div className="mx-auto max-w-[1100px] px-5 md:px-8 pt-16">
             <div className="label-tag mb-5">📜 Certifications · scroll to advance</div>
           </div>
@@ -566,7 +532,6 @@ function Index() {
           />
         </section>
 
-        {/* CLOSING CTA */}
         <section className="relative">
           <HalftoneField strength={1} interactive className="h-[500px]">
             <div className="relative mx-auto flex h-full max-w-[1100px] flex-col justify-between px-5 py-14 md:px-8">
@@ -575,10 +540,7 @@ function Index() {
                 <span>Ambient · continuous</span>
               </div>
               <div className="text-center">
-                <div
-                  className="display-tight"
-                  style={{ fontSize: "clamp(40px, 8vw, 108px)", mixBlendMode: "difference" as any, color: "#fff" }}
-                >
+                <div className="display-tight" style={{ fontSize: "clamp(40px, 8vw, 108px)", mixBlendMode: "difference" as any, color: "#fff" }}>
                   Let&apos;s build something<br />worth noticing.
                 </div>
                 <a
