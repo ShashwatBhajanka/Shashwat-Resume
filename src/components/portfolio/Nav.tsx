@@ -61,11 +61,7 @@ export function Nav() {
   return (
     <nav
       className="fixed inset-x-0 top-0 z-50 h-12 transition-colors duration-300"
-      style={{
-        backgroundColor: scrolled ? "color-mix(in oklab, var(--bg) 78%, transparent)" : "transparent",
-        backdropFilter: scrolled ? "blur(10px)" : undefined,
-        borderBottom: scrolled ? "1px solid var(--border-soft)" : "1px solid transparent",
-      }}
+      style={{ backgroundColor: "var(--bg)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--border-soft)" }}
     >
       <div className="mx-auto flex h-full max-w-[880px] items-center justify-between px-5 md:px-7">
         <a href="#home" onClick={jump("home")} className="text-xs text-text-soft hover:text-text transition">

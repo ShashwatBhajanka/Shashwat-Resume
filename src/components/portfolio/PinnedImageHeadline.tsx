@@ -1,10 +1,9 @@
 import { useScroll, useTransform, motion } from "framer-motion";
 import { useRef } from "react";
-import { ImagePlaceholder } from "./ImagePlaceholder";
 
 /**
  * Sticky headline where a mid-sentence word is replaced by a small
- * square image that cross-fades between 3 placeholders while pinned.
+ * square image that cross-fades between 3 real images while pinned.
  */
 export function PinnedImageHeadline() {
   const ref = useRef<HTMLDivElement>(null);
@@ -16,6 +15,12 @@ export function PinnedImageHeadline() {
   const b = useTransform(scrollYProgress, [0.33, 0.5, 0.66, 0.83], [0, 1, 1, 0]);
   const c = useTransform(scrollYProgress, [0.66, 0.83, 1], [0, 1, 1]);
 
+const images = [
+    { src: "/Code.png", alt: "Code" },
+    { src: "/data.png", alt: "Data" },
+    { src: "/ashoka.png", alt: "Campus" },
+  ];
+
   return (
     <section ref={ref} className="relative" style={{ height: "220vh" }}>
       <div className="sticky top-0 flex h-screen items-center">
@@ -26,15 +31,23 @@ export function PinnedImageHeadline() {
           >
             <span>Built at the intersection of </span>
             <span className="relative inline-block align-middle mx-2" style={{ width: "1.05em", height: "1.05em" }}>
-              <motion.div style={{ opacity: a }} className="absolute inset-0">
-                <ImagePlaceholder aspect="1/1" label="code" />
-              </motion.div>
-              <motion.div style={{ opacity: b }} className="absolute inset-0">
-                <ImagePlaceholder aspect="1/1" label="data" />
-              </motion.div>
-              <motion.div style={{ opacity: c }} className="absolute inset-0">
-                <ImagePlaceholder aspect="1/1" label="campus" />
-              </motion.div>
+              {images.map((img, i) => {
+                const opacity = i === 0 ? a : i === 1 ? b : c;
+                return (
+                  <motion.div
+                    key={img.src}
+                    style={{ opacity }}
+                    className="absolute inset-0"
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.alt}
+                      className="w-full h-full object-cover"
+                      style={{ borderRadius: "8px" }}
+                    />
+                  </motion.div>
+                );
+              })}
             </span>
             <span> data, code, and impact.</span>
           </div>

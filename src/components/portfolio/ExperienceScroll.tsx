@@ -106,6 +106,74 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
     return () => window.removeEventListener("scroll", updateProgress);
   }, [updateProgress]);
 
+  // Discrete snap: when the user stops scrolling, smoothly target the nearest entry.
+  useEffect(() => {
+    if (!isDesktop || reduced || N <= 1) return;
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
+    let isSnapping = false;
+    let lastScrollY = window.scrollY;
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const snap = () => {
+      if (isSnapping) return;
+
+      const rect = wrap.getBoundingClientRect();
+      const sectionTop = rect.top + window.scrollY;
+      const scrollableRange = rect.height - window.innerHeight;
+      if (scrollableRange <= 0) return;
+
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < sectionTop - 1 || currentScrollY > sectionTop + scrollableRange + 1) return;
+
+      const scrolledTo = -rect.top;
+      const total = rect.height - window.innerHeight;
+      const rawProgress = Math.min(1, Math.max(0, scrolledTo / total));
+      const nearestIndex = Math.round(rawProgress * (N - 1));
+      const clampedIndex = Math.max(0, Math.min(N - 1, nearestIndex));
+      const targetProgress = clampedIndex / Math.max(1, N - 1);
+
+      const currentProgress = scrolledTo / total;
+      if (Math.abs(currentProgress - targetProgress) < 0.001) return;
+
+      const targetScrollY = sectionTop + targetProgress * scrollableRange;
+
+      isSnapping = true;
+      lastScrollY = window.scrollY;
+      window.scrollTo({ top: targetScrollY, behavior: "smooth" });
+
+      const clearSnap = () => {
+        isSnapping = false;
+        window.removeEventListener("scrollend", clearSnap);
+      };
+      window.addEventListener("scrollend", clearSnap);
+      setTimeout(clearSnap, 600);
+    };
+
+    const onScroll = () => {
+      const delta = Math.abs(window.scrollY - lastScrollY);
+      if (delta > 0.5) isSnapping = false;
+      lastScrollY = window.scrollY;
+      if (debounceTimer !== null) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(snap, 120);
+    };
+
+    const onResize = () => {
+      if (debounceTimer !== null) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(snap, 200);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      if (debounceTimer !== null) clearTimeout(debounceTimer);
+    };
+  }, [isDesktop, reduced, N]);
+
   const active = Math.min(N - 1, Math.max(0, Math.floor(progress * N * 0.999)));
 
   if (!isDesktop || reduced) {
@@ -121,7 +189,7 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
       style={{ height: `${N * 90 + 100}vh` }}
     >
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <div className="mx-auto grid w-full max-w-[1100px] grid-cols-[80px_1fr_1fr] items-center gap-10 px-5 md:px-8">
+        <div className="mx-auto grid w-full max-w-[1100px] grid-cols-[80px_1fr_1.1fr] items-center gap-10 px-5 md:px-8">
           {/* Progress rail */}
           <div className="relative flex h-[60vh] flex-col">
             <div className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
@@ -168,7 +236,7 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
                 <div className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
                   {current.date}
                 </div>
-                <div className="mt-2 text-sm" style={{ color: "var(--accent)" }}>
+                <div className="mt-2 text-sm text-left" style={{ color: "var(--accent)" }}>
                   {current.org}
                 </div>
                 <div
@@ -237,11 +305,13 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="display-tight text-text"
+                  className="display-tight text-left text-text leading-[1.1]"
                   style={{
-                    fontSize: "clamp(40px, 6vw, 88px)",
-                    lineHeight: 0.9,
-                    letterSpacing: "-0.04em",
+                    fontSize: "clamp(40px, 7vw, 96px)",
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1,
+                    overflowWrap: "break-word",
+                    hyphens: "auto",
                   }}
                 >
                   {current.org.split("·")[0].trim()}

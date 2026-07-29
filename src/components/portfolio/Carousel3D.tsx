@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 const CARD_W = 380;
 const CARD_H = 460;
@@ -27,6 +27,87 @@ export function Carousel3D<T>({
   const reduced =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Snap logic for desktop pinned 3D carousel — ensures scroll always
+  // settles with a card perfectly centered (d === 0 for exactly one card).
+  useEffect(() => {
+    if (reduced || total <= 1) return;
+    const sectionEl = ref.current;
+    if (!sectionEl) return;
+
+    let isSnapping = false;
+    let lastScrollY = window.scrollY;
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearDebounce = () => {
+      if (debounceTimer !== null) {
+        clearTimeout(debounceTimer);
+        debounceTimer = null;
+      }
+    };
+
+    const doSnap = () => {
+      if (isSnapping) return;
+
+      const sectionTop = sectionEl.getBoundingClientRect().top + window.scrollY;
+      const scrollableRange = sectionEl.offsetHeight - window.innerHeight;
+      if (scrollableRange <= 0) return;
+
+      // Guard: only snap while the section is in the pinned scroll range.
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < sectionTop - 1 || currentScrollY > sectionTop + scrollableRange + 1) return;
+
+      const currentProgress = scrollYProgress.get();
+      const nearestIndex = Math.round(currentProgress * (total - 1));
+      const clampedIndex = Math.max(0, Math.min(total - 1, nearestIndex));
+      const targetProgress = clampedIndex / (total - 1);
+
+      // Already settled — skip.
+      if (Math.abs(currentProgress - targetProgress) < 0.001) return;
+
+      const targetScrollY = sectionTop + targetProgress * scrollableRange;
+
+      isSnapping = true;
+      lastScrollY = window.scrollY;
+      window.scrollTo({ top: targetScrollY, behavior: "smooth" });
+
+      const clearSnap = () => {
+        isSnapping = false;
+        window.removeEventListener("scrollend", clearSnap);
+      };
+
+      window.addEventListener("scrollend", clearSnap);
+      setTimeout(clearSnap, 500);
+    };
+
+    const onScroll = () => {
+      const delta = Math.abs(window.scrollY - lastScrollY);
+      if (delta > 0.5) {
+        // Genuine user scroll activity — release snap lock early so next
+        // debounced snap can fire instead of being blocked by isSnapping.
+        isSnapping = false;
+        lastScrollY = window.scrollY;
+      }
+      clearDebounce();
+      debounceTimer = setTimeout(doSnap, 120);
+    };
+
+    const onResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(doSnap, 200);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      clearDebounce();
+      if (resizeTimer !== null) clearTimeout(resizeTimer);
+    };
+  }, [scrollYProgress, total, reduced]);
 
   // Mobile / reduced-motion: horizontal scroll-snap fallback
   return (
@@ -99,46 +180,41 @@ function CarouselCard({
 
   const scale = useTransform(activeIdx, (a) => {
     const d = Math.min(Math.abs(index - a), 3);
-    return 1 - d * 0.09;
+    return 1 - d * 0.05;
   });
   const rotateY = useTransform(activeIdx, (a) => {
     const d = Math.max(-3, Math.min(3, index - a));
-    return -d * 16;
-  });
-  const z = useTransform(activeIdx, (a) => {
-    const d = Math.min(Math.abs(index - a), 3);
-    return -d * 90;
+    return -d * 10;
   });
   const opacity = useTransform(activeIdx, (a) => {
-    const d = Math.min(Math.abs(index - a), 4);
-    return Math.max(0.35, 1 - d * 0.22);
+    const d = Math.min(Math.abs(index - a), 3);
+    return Math.max(0.7, 1 - d * 0.1);
   });
   const zIndex = useTransform(activeIdx, (a) =>
-    Math.round(100 - Math.abs(index - a) * 10)
+    Math.round(100 - Math.abs(index - a) * 5)
   );
   const shadow = useTransform(activeIdx, (a) => {
     const d = Math.min(Math.abs(index - a), 3);
-    const blur = 40 - d * 10;
-    const alpha = Math.max(0.15, 0.55 - d * 0.15);
-    return `0 30px ${blur}px rgba(0,0,0,${alpha})`;
+    const blur = 30 - d * 8;
+    const alpha = Math.max(0.2, 0.45 - d * 0.1);
+    return `0 20px ${blur}px rgba(0,0,0,${alpha})`;
   });
 
   return (
     <motion.div
-      className="shrink-0 overflow-hidden"
+      className="shrink-0 overflow-hidden relative"
       style={{
         width: CARD_W,
         height: CARD_H,
         scale,
         rotateY,
-        z,
         opacity,
         zIndex,
         boxShadow: shadow,
         borderRadius: 12,
         border: "1px solid var(--border)",
         transformStyle: "preserve-3d",
-        backfaceVisibility: "hidden",
+        pointerEvents: "auto",
       }}
     >
       {children}
@@ -174,13 +250,14 @@ function SnapRow<T>({
             key={i}
             className="shrink-0 overflow-hidden"
             style={{
-              width: Math.min(CARD_W, 320),
-              height: CARD_H,
-              scrollSnapAlign: "center",
-              borderRadius: 12,
-              border: "1px solid var(--border)",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
-            }}
+               width: Math.min(CARD_W, 320),
+               height: CARD_H,
+               scrollSnapAlign: "center",
+               scrollSnapStop: "always",
+               borderRadius: 12,
+               border: "1px solid var(--border)",
+               boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
+             }}
           >
             {renderCard(item, i)}
           </div>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Nav } from "@/components/portfolio/Nav";
 import { HalftoneField } from "@/components/portfolio/HalftoneField";
 import { Reveal } from "@/components/portfolio/Reveal";
@@ -53,6 +54,7 @@ const EDUCATION = [
       "Intro to Computer Science (B+)",
       "Discrete Mathematics (A−)",
     ],
+    image: "/ashoka.png",
   },
   {
     school: "Fountainhead School",
@@ -62,6 +64,7 @@ const EDUCATION = [
       { label: "Higher Level", chips: ["Mathematics AI HL (7/7)", "Computer Science HL (6/7)", "Economics HL (6/7)"] },
       { label: "Standard Level", chips: ["Psychology SL (6/7)", "English SL (6/7)", "Hindi SL (6/7)"] },
     ],
+    image: "/FHS.png",
   },
 ];
 
@@ -117,83 +120,87 @@ type Card = {
   desc: string;
   accent: string;
   isPlaceholder?: boolean;
+  image?: string;
 };
 
 const ACHIEVEMENTS: Card[] = [
   { emoji: "🏅", title: "Distinction, Euclid Mathematics Competition", year: "2024",
     org: "University of Waterloo (CEMC)",
     desc: "Achieved a Distinction ranking in the Euclid Mathematics Contest, a competitive problem-solving exam covering algebra, geometry, and calculus.",
-    accent: "#1A6B5A" },
+    accent: "#1A6B5A",
+    image: "/achievemements/EuclidMath.png" },
   { emoji: "🎵", title: "Trinity Piano & Music Theory, Distinction – Grade 2", year: "2023–24",
     org: "Trinity College London",
     desc: "Earned a Distinction in Grade 2 Piano Practical and Music Theory examinations, demonstrating proficiency in performance and theoretical understanding.",
-    accent: "#6D28D9" },
+    accent: "#6D28D9",
+    image: "/achievemements/Piano.png" },
   { emoji: "🥇", title: "First Place, Inter-School Competition", year: "2023",
     org: "Fountainhead School",
     desc: "Represented Fountainhead School as band lead and lead singer, securing first place.",
-    accent: "#B45309" },
+    accent: "#B45309",
+    image: "/achievemements/MusicCompetition.png" },
 ];
 
 const CERTIFICATIONS: Card[] = [
   { emoji: "🤖", title: "Machine Learning Basics", year: "2024", org: "Sung Kyun Kwan University",
     desc: "Completed an introductory course on Machine Learning. Learnt and practiced concepts such as supervised learning, regression, and classification models.",
-    accent: "#0369A1" },
+    accent: "#0369A1",
+    image: "/Certifications/MachineLearning.png" },
   { emoji: "🗄️", title: "SQL Programming", year: "2024", org: "Udemy",
     desc: "Learnt advanced SQL techniques, including complex data querying, multi-table joins, and data merging to drive actionable insights.",
-    accent: "#047857" },
+    accent: "#047857",
+    image: "/Certifications/SQL.png" },
   { emoji: "🐍", title: "Python — 100 Days of Code", year: "2024", org: "Udemy",
     desc: "Add details for this certification.", isPlaceholder: true,
-    accent: "#B45309" },
+    accent: "#B45309",
+    image: "/Certifications/Python.png" },
   { emoji: "💰", title: "Financial Mathematics", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    accent: "#4F46E5" },
+    accent: "#4F46E5",
+    image: "/Certifications/FinancialMath.png" },
   { emoji: "📊", title: "Econometrics", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    accent: "#7C3AED" },
+    accent: "#7C3AED",
+    image: "/Certifications/Econometrics.png" },
   { emoji: "🔬", title: "Data Science", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    accent: "#0891B2" },
+    accent: "#0891B2",
+    image: "/Certifications/DataSceince.png" },
   { emoji: "🚀", title: "Entrepreneurship", org: "add organisation",
     desc: "Add details for this certification.", isPlaceholder: true,
-    accent: "#C2410C" },
+    accent: "#C2410C",
+    image: "/Certifications/Entreprenureship.png" },
 ];
 
-function CarouselFlipCard({ card }: { card: Card }) {
-  const [open, setOpen] = useState(false);
+function CarouselFlipCard({ card, onClick }: { card: Card; onClick: () => void }) {
   return (
-    <button
+    <motion.button
       type="button"
-      onClick={() => setOpen((o) => !o)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setOpen((o) => !o);
-        }
-      }}
-      aria-expanded={open}
-      className="relative block h-full w-full overflow-hidden text-left"
+      onClick={onClick}
+      className="absolute inset-0 w-full h-full overflow-hidden text-left cursor-pointer"
       style={{ background: "var(--bg-elevated)" }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
     >
-      <div
-        className="absolute inset-x-0 top-0 h-1"
-        style={{
-          background: `linear-gradient(90deg, ${card.accent}, color-mix(in oklab, ${card.accent} 40%, transparent))`,
-        }}
-      />
-      <div
-        className="absolute inset-0 flex flex-col p-6 transition-opacity duration-500"
-        style={{ opacity: open ? 0 : 1 }}
+      <motion.div
+        className="absolute inset-0 flex flex-col p-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <div className="flex items-start justify-between">
-          <div
+          <motion.div
             className="flex h-11 w-11 items-center justify-center border text-lg"
             style={{
               borderColor: "var(--border)",
               background: `color-mix(in oklab, ${card.accent} 14%, transparent)`,
             }}
+            initial={{ scale: 0.8, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
             {card.emoji}
-          </div>
+          </motion.div>
           {card.isPlaceholder ? (
             <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: card.accent }}>
               placeholder
@@ -204,43 +211,58 @@ function CarouselFlipCard({ card }: { card: Card }) {
             </span>
           )}
         </div>
-        <div className="mt-8">
+        <motion.div
+          className="mt-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="label-tag mb-2">{card.org}</div>
           <div className="text-[18px] font-semibold leading-tight text-text display-tight">
             {card.title}
           </div>
-        </div>
-        <div className="mt-auto pt-6">
-          <ImagePlaceholder aspect="16/9" />
-        </div>
-        <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-text-muted">
-          <span>{card.isPlaceholder ? "add details" : "detail"}</span>
-          <span>tap to reveal →</span>
-        </div>
-      </div>
-      <div
-        className="absolute inset-0 flex flex-col p-6 transition-opacity duration-500"
-        style={{ opacity: open ? 1 : 0, background: "var(--bg-elevated)" }}
-      >
-        <div className="flex items-start justify-between">
-          <div className="label-tag">Organisation</div>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
-            {card.year ?? ""}
-          </span>
-        </div>
-        <div className="mt-2 text-sm font-semibold text-text">{card.org}</div>
-        <div className="mt-4 text-[15px] font-semibold text-text display-tight leading-tight">
-          {card.title}
-        </div>
-        <p className="mt-4 text-xs leading-relaxed text-text-soft">{card.desc}</p>
-        <div className="mt-auto flex items-center justify-between pt-4">
-          <div className="h-px flex-1 mr-4" style={{ background: card.accent, opacity: 0.6 }} />
-          <span className="font-mono text-[9px] uppercase tracking-widest text-text-muted">
-            ← close
-          </span>
-        </div>
-      </div>
-    </button>
+        </motion.div>
+        <motion.div
+          className="mt-auto pt-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {card.image ? (
+            <motion.img
+              src={card.image}
+              alt={card.title}
+              className="w-full aspect-[16/9] object-cover rounded-xl"
+              style={{ borderRadius: "12px" }}
+              initial={{ scale: 1.05, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            />
+          ) : (
+            <ImagePlaceholder aspect="16/9" />
+          )}
+        </motion.div>
+        <motion.div
+          className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-text-muted"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.3 }}
+        >
+          <span>detail</span>
+          <span>tap to view →</span>
+        </motion.div>
+        <motion.div
+          className="absolute inset-x-0 top-0 h-1"
+          style={{
+            background: `linear-gradient(90deg, ${card.accent}, color-mix(in oklab, ${card.accent} 40%, transparent))`,
+          }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.1 }}
+          style={{ transformOrigin: "left center" }}
+        />
+      </motion.div>
+    </motion.button>
   );
 }
 
@@ -250,12 +272,22 @@ type ClubCardData = {
   desc: string;
   tags: string[];
   meta?: string;
+  image?: string;
 };
 
 function ClubCard({ c }: { c: ClubCardData }) {
   return (
     <div className="h-full border p-6" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
-      <ImagePlaceholder aspect="16/9" />
+      {c.image ? (
+        <img
+          src={c.image}
+          alt={c.org}
+          className="w-full aspect-[16/9] object-cover mb-5"
+          style={{ borderRadius: "4px" }}
+        />
+      ) : (
+        <ImagePlaceholder aspect="16/9" />
+      )}
       <div className="mt-5 flex items-center justify-between">
         <div className="label-tag">{c.org}</div>
         {c.meta && (
@@ -277,12 +309,14 @@ const CLUBS: ClubCardData[] = [
     org: "Ashoka Data Society",
     desc: "Lead independent research using university resources and varied data sources, publishing insights in a curated data review for the campus community.",
     tags: ["Research", "Data Analysis", "Publishing"],
+    image: "/data.png",
   },
   {
     role: "Full Stack Developer",
     org: "Ashoka Ministry of Technology",
     desc: "Build and maintain university services used by 3,000+ students — applying web dev and analytics to identify real student needs.",
     tags: ["Full Stack", "3,000+ Users"],
+    image: "/TechMin.jpg",
   },
   {
     role: "Vocalist",
@@ -290,6 +324,7 @@ const CLUBS: ClubCardData[] = [
     desc: "Member of the university's acapella society, performing at campus events and inter-college showcases.",
     tags: ["Acapella", "Performance"],
     meta: "Present",
+    image: "/AppleCello.JPG",
   },
   {
     role: "Varsity Player",
@@ -297,10 +332,21 @@ const CLUBS: ClubCardData[] = [
     desc: "Represent Ashoka University on the Ultimate Frisbee varsity team across regional tournaments.",
     tags: ["Frisbee", "Varsity"],
     meta: "Present",
+    image: "/Frisbee.JPG",
   },
 ];
 
 export function App() {
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedCard(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="relative min-h-screen">
       <Nav />
@@ -319,7 +365,7 @@ export function App() {
               >
                 Shashwat<br />Bhajanka
               </h1>
-            </Reveal>
+             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-8 max-w-[560px] text-[15px] leading-relaxed text-text">
                 Computer Science Student &amp; Data Analyst. Building at the intersection of data, code, and impact. Hands-on experience in analytics, web development, and research.
@@ -358,7 +404,7 @@ export function App() {
           <Reveal delay={0.2}>
             <div className="mt-16 grid grid-cols-3 gap-4 border-t pt-10" style={{ borderColor: "var(--border)" }}>
               {[
-                { n: null, label: "Projects", note: "placeholder" },
+                { n: 3, label: "Projects" },
                 { n: YEARS_OF_EXPERIENCE, label: "Years of Experience" },
                 { n: EXPERIENCE.length, label: "Roles Held" },
               ].map((s, i) => (
@@ -397,7 +443,16 @@ export function App() {
                   <div className="font-mono text-[11px] uppercase tracking-widest text-text-muted">{e.date}</div>
                   <div className="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-6">
                     <div className="w-40">
-                      <ImagePlaceholder aspect="1/1" />
+                      {e.image ? (
+                        <img
+                          src={e.image}
+                          alt={e.school}
+                          className="w-full aspect-square object-cover"
+                          style={{ borderRadius: "8px" }}
+                        />
+                      ) : (
+                        <ImagePlaceholder aspect="1/1" />
+                      )}
                     </div>
                     <div>
                       <div className="text-2xl md:text-3xl font-semibold text-text display-tight">{e.school}</div>
@@ -520,7 +575,7 @@ export function App() {
           <Carousel3D
             items={ACHIEVEMENTS}
             label="Achievements carousel"
-            renderCard={(a) => <CarouselFlipCard card={a} />}
+            renderCard={(a) => <CarouselFlipCard card={a} onClick={() => setSelectedCard(a)} />}
           />
           <div className="mx-auto max-w-[1100px] px-5 md:px-8 pt-16">
             <div className="label-tag mb-5">📜 Certifications · scroll to advance</div>
@@ -528,7 +583,7 @@ export function App() {
           <Carousel3D
             items={CERTIFICATIONS}
             label="Certifications carousel"
-            renderCard={(a) => <CarouselFlipCard card={a} />}
+            renderCard={(a) => <CarouselFlipCard card={a} onClick={() => setSelectedCard(a)} />}
           />
         </section>
 
@@ -560,7 +615,73 @@ export function App() {
           <div className="font-mono text-[11px] text-text-muted">Built with ✦ by Shashwat Bhajanka</div>
           <div className="mt-1 font-mono text-[10px] text-text-muted">Last updated · July 2026</div>
         </footer>
-      </main>
-    </div>
-  );
-}
+       </main>
+
+       <AnimatePresence>
+         {selectedCard && (
+           <motion.div
+             key="modal"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             transition={{ duration: 0.3 }}
+             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+             style={{ backgroundColor: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}
+             onClick={() => setSelectedCard(null)}
+           >
+             <motion.button
+               type="button"
+               aria-label="Close"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 setSelectedCard(null);
+               }}
+               className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border text-white/70 hover:text-white transition"
+               style={{ borderColor: "var(--border)" }}
+               whileHover={{ scale: 1.1 }}
+               whileTap={{ scale: 0.9 }}
+             >
+               ✕
+             </motion.button>
+             <motion.div
+               key="modal-content"
+               initial={{ opacity: 0, scale: 0.92, y: 20 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.92, y: 20 }}
+               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+               className="relative w-full max-w-3xl overflow-hidden rounded-2xl border"
+               style={{
+                 borderColor: "var(--border)",
+                 background: "var(--bg-elevated)",
+               }}
+               onClick={(e) => e.stopPropagation()}
+             >
+                {selectedCard.image && (
+                  <img
+                    src={selectedCard.image}
+                    alt={selectedCard.title}
+                    className="w-full rounded-xl"
+                  />
+                )}
+               <div className="p-6 md:p-8">
+                 <div className="mb-2 flex items-center gap-3">
+                   <span className="text-2xl">{selectedCard.emoji}</span>
+                   <div className="label-tag">{selectedCard.org}</div>
+                 </div>
+                 <h3 className="text-xl md:text-2xl font-semibold text-text display-tight leading-tight">
+                   {selectedCard.title}
+                 </h3>
+                 <p className="mt-4 text-sm leading-relaxed text-text-soft">
+                   {selectedCard.desc}
+                 </p>
+               </div>
+               <div className="absolute inset-x-0 top-0 h-[3px]" style={{
+                 background: `linear-gradient(90deg, ${selectedCard.accent}, color-mix(in oklab, ${selectedCard.accent} 40%, transparent))`,
+               }} />
+             </motion.div>
+           </motion.div>
+         )}
+       </AnimatePresence>
+     </div>
+   );
+ }
