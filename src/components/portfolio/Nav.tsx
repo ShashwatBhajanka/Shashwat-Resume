@@ -67,27 +67,29 @@ export function Nav() {
         <a href="#home" onClick={jump("home")} className="text-xs text-text-soft hover:text-text transition">
           Shashwat Bhajanka
         </a>
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {SECTIONS.slice(1).map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              onClick={jump(s.id)}
-              className="px-2 py-1 text-[11px] whitespace-nowrap transition-colors"
-              style={{ color: active === s.id ? "var(--accent)" : "var(--text-soft)" }}
-            >
-              {s.label}
-            </a>
-          ))}
+        <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto">
+            {SECTIONS.slice(1).map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                onClick={jump(s.id)}
+                className="px-2 py-1 text-[11px] whitespace-nowrap transition-colors"
+                style={{ color: active === s.id ? "var(--accent)" : "var(--text-soft)" }}
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
           <button
             aria-label="Toggle theme"
             onClick={toggleTheme}
-            className="ml-2 flex h-7 w-7 items-center justify-center rounded-md border hover:text-accent transition"
+            className="ml-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border hover:text-accent transition"
             style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}
           >
             {theme === "dark" ? <Sun size={13} /> : <Moon size={13} />}
           </button>
-          <div className="ml-1">
+          <div className="ml-1 shrink-0">
             <A11yMenu />
           </div>
         </div>

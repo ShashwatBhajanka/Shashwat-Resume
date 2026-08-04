@@ -155,6 +155,10 @@ function Quad({
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     []
   );
+  const classReduced = useMemo(
+    () => () => typeof document !== "undefined" && document.documentElement.classList.contains("a11y-reduce"),
+    []
+  );
 
   const uniforms = useMemo(
     () => ({
@@ -174,7 +178,7 @@ function Quad({
   useFrame((_, dt) => {
     if (!mat.current) return;
     const u = mat.current.uniforms;
-    if (!reduced) u.uTime.value += dt;
+    if (!reduced && !classReduced()) u.uTime.value += dt;
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     u.uResolution.value.set(size.width * dpr, size.height * dpr);
     u.uBg.value.copy(colors.current.bg);

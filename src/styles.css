@@ -112,13 +112,45 @@
 }
 
 /* Accessibility toggles applied on <html> */
-html.a11y-large { font-size: 112.5%; }
+html.a11y-large { font-size: 125%; }
 html.a11y-contrast { --text-soft: var(--text); --text-muted: var(--text); }
 html.a11y-underline a { text-decoration: underline !important; text-underline-offset: 4px; }
 html.a11y-reduce *, html.a11y-reduce *::before, html.a11y-reduce *::after {
   animation-duration: 0.001ms !important;
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
+}
+html.a11y-spacing {
+  line-height: 1.9 !important;
+  letter-spacing: 0.02em !important;
+  word-spacing: 0.05em !important;
+}
+html.a11y-spacing p, html.a11y-spacing li { margin-bottom: 1.5em; }
+html.a11y-font { --font-sans: "Atkinson Hyperlegible", "Outfit", ui-sans-serif, system-ui, sans-serif; }
+
+/* Always-on visible focus indicator for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Skip-to-content link: hidden until focused via keyboard */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 200;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 1rem;
 }
 
 /* Hero scrim overlay for shader legibility */
@@ -128,8 +160,9 @@ html.a11y-reduce *, html.a11y-reduce *::before, html.a11y-reduce *::after {
   inset: 0;
   pointer-events: none;
   background: linear-gradient(180deg,
-    color-mix(in oklab, var(--bg) 15%, transparent) 0%,
-    color-mix(in oklab, var(--bg) 40%, transparent) 60%,
-    color-mix(in oklab, var(--bg) 70%, transparent) 100%);
+    color-mix(in oklab, var(--bg) 10%, transparent) 0%,
+    color-mix(in oklab, var(--bg) 45%, transparent) 45%,
+    color-mix(in oklab, var(--bg) 82%, transparent) 78%,
+    color-mix(in oklab, var(--bg) 95%, transparent) 100%);
   z-index: 1;
 }

@@ -349,6 +349,7 @@ export function App() {
 
   return (
     <div className="relative min-h-screen">
+      <a href="#main" className="skip-link">Skip to main content</a>
       <Nav />
       <BackToTop />
 
@@ -356,18 +357,18 @@ export function App() {
         <HalftoneField strength={0.75} className="min-h-[100svh] hero-scrim">
           <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
             <Reveal>
-              <div className="label-tag mb-6">Portfolio · 2026</div>
+              <div className="label-tag mb-6" style={{ color: "var(--text)" }}>Portfolio · 2026</div>
             </Reveal>
             <Reveal delay={0.1}>
               <h1
                 className="display-tight text-text"
-                style={{ fontSize: "clamp(56px, 12vw, 132px)", mixBlendMode: "difference" as any, color: "#fff" }}
+                style={{ fontSize: "clamp(56px, 12vw, 132px)" }}
               >
                 Shashwat<br />Bhajanka
               </h1>
              </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-8 max-w-[560px] text-[15px] leading-relaxed text-text">
+              <p className="mt-8 max-w-[560px] text-[15px] leading-relaxed text-text-soft">
                 Computer Science Student &amp; Data Analyst. Building at the intersection of data, code, and impact. Hands-on experience in analytics, web development, and research.
               </p>
             </Reveal>
@@ -394,7 +395,7 @@ export function App() {
         </HalftoneField>
       </section>
 
-      <main className="relative">
+      <main id="main" className="relative scroll-mt-16">
         <section id="overview" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Introduction</SectionLabel></Reveal>
           <Reveal delay={0.05}><H2>About Me</H2></Reveal>
@@ -553,11 +554,11 @@ export function App() {
 
         <section id="achievements" className="relative">
           <div className="relative">
-            <HalftoneField strength={0.6} className="h-[360px]">
+            <HalftoneField strength={0.6} className="h-[360px] hero-scrim">
               <div className="relative mx-auto flex h-full max-w-[1100px] flex-col justify-end px-5 pb-14 md:px-8">
                 <Reveal><SectionLabel>Portfolio</SectionLabel></Reveal>
                 <Reveal delay={0.05}>
-                  <h2 className="display-tight text-text" style={{ fontSize: "clamp(40px, 7vw, 88px)", mixBlendMode: "difference" as any, color: "#fff" }}>
+                  <h2 className="display-tight text-text" style={{ fontSize: "clamp(40px, 7vw, 88px)" }}>
                     Achievements &amp;<br />Certifications
                   </h2>
                 </Reveal>
@@ -587,33 +588,56 @@ export function App() {
           />
         </section>
 
-        <section className="relative">
-          <HalftoneField strength={1} interactive className="h-[500px]">
+        <footer id="contact" className="relative">
+          <HalftoneField strength={1} interactive className="h-[560px]">
             <div className="relative mx-auto flex h-full max-w-[1100px] flex-col justify-between px-5 py-14 md:px-8">
-              <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-white/70" style={{ mixBlendMode: "difference" as any }}>
-                <span>Hold to disrupt</span>
-                <span>Ambient · continuous</span>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-text" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+                  Contact
+                </span>
+                <span className="border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+                  Always open to a conversation
+                </span>
               </div>
               <div className="text-center">
-                <div className="display-tight" style={{ fontSize: "clamp(40px, 8vw, 108px)", mixBlendMode: "difference" as any, color: "#fff" }}>
-                  Let&apos;s build something<br />worth noticing.
+                <div className="display-tight" style={{ fontSize: "clamp(40px, 8vw, 108px)", fontWeight: 800 }}>
+                  <span className="inline-block px-3 py-1" style={{ background: "var(--accent)", color: "var(--bg)" }}>
+                    Have an idea?
+                  </span>
+                  <br />
+                  <span className="mt-2 inline-block px-3 py-1" style={{ background: "var(--accent)", color: "var(--bg)" }}>
+                    Let&apos;s make it real.
+                  </span>
                 </div>
-                <a
-                  href="mailto:bhajankashashwat@gmail.com"
-                  className="mt-8 inline-block font-mono text-[11px] uppercase tracking-widest underline underline-offset-[6px]"
-                  style={{ mixBlendMode: "difference" as any, color: "#fff" }}
-                >
-                  Start a conversation ↗
-                </a>
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                  {[
+                    { label: "Email", href: "mailto:bhajankashashwat@gmail.com" },
+                    { label: "LinkedIn", href: "https://linkedin.com/in/shashwat-bhajanka" },
+                    { label: "GitHub", href: "https://github.com/ShashwatBhajanka" },
+                  ].map((l) => (
+                    <a
+                      key={l.label}
+                      href={l.href}
+                      target={l.href.startsWith("http") ? "_blank" : undefined}
+                      rel="noreferrer"
+                      className="border px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-widest transition hover:opacity-80"
+                      style={{ borderColor: "var(--accent)", background: "var(--accent)", color: "var(--bg)" }}
+                    >
+                      {l.label} ↗
+                    </a>
+                  ))}
+                </div>
               </div>
-              <div />
+              <div className="text-center">
+                <span className="inline-block border px-2.5 py-1 font-mono text-[11px] font-semibold text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+                  Built with ✦ by Shashwat Bhajanka
+                </span>
+                <span className="ml-2 inline-block border px-2.5 py-1 font-mono text-[10px] font-semibold text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+                  Last updated · July 2026
+                </span>
+              </div>
             </div>
           </HalftoneField>
-        </section>
-
-        <footer className="py-10 text-center">
-          <div className="font-mono text-[11px] text-text-muted">Built with ✦ by Shashwat Bhajanka</div>
-          <div className="mt-1 font-mono text-[10px] text-text-muted">Last updated · July 2026</div>
         </footer>
        </main>
 

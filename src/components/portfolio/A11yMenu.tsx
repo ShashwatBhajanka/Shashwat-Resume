@@ -8,6 +8,8 @@ const TOGGLES: Toggle[] = [
   { key: "a11y-contrast", label: "High contrast", desc: "Boost text contrast" },
   { key: "a11y-underline", label: "Underline links", desc: "Always underline links" },
   { key: "a11y-reduce", label: "Reduce motion", desc: "Disable animations" },
+  { key: "a11y-spacing", label: "Reading spacing", desc: "Widen line and letter spacing" },
+  { key: "a11y-font", label: "Dyslexia-friendly font", desc: "Use a clearer, high-legibility typeface" },
 ];
 
 function readState(): Record<string, boolean> {
