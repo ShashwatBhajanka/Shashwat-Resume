@@ -3,14 +3,20 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 function useThemeColors() {
-  const ref = useRef({ bg: new THREE.Color("#0A0A0A"), fg: new THREE.Color("#EDEDED") });
+  const ref = useRef({
+    bg: new THREE.Color("#0A0A0A"),
+    fg: new THREE.Color("#EDEDED"),
+    accent: new THREE.Color("#D4A574"),
+  });
   useEffect(() => {
     const read = () => {
       const cs = getComputedStyle(document.documentElement);
       const bg = cs.getPropertyValue("--bg").trim() || "#0A0A0A";
       const fg = cs.getPropertyValue("--text").trim() || "#EDEDED";
+      const accent = cs.getPropertyValue("--accent").trim() || "#D4A574";
       ref.current.bg.set(bg);
       ref.current.fg.set(fg);
+      ref.current.accent.set(accent);
     };
     read();
     const mo = new MutationObserver(read);
@@ -38,6 +44,7 @@ const fragment = /* glsl */ `
   uniform float uMouseActive;
   uniform vec3 uBg;
   uniform vec3 uFg;
+  uniform vec3 uAccent;
   uniform float uStrength;
   uniform float uDotSize;
 
@@ -71,66 +78,77 @@ const fragment = /* glsl */ `
     float a=0.5;
     for(int i=0;i<3;i++){
       s+=a*snoise(p);
-      // Much faster large-scale drift so the wave visibly travels
-      p=p*2.02+vec2(uTime*0.18, -uTime*0.12);
-      a*=0.5;
+      // Brisk large-scale drift — the wave visibly travels across the field
+      p=p*2.05+vec2(uTime*0.24, -uTime*0.17);
+      a*=0.52;
     }
     return s;
   }
 
-  // Bayer 8×8 ordered dither threshold (recursive, no array needed)
-  float threshold(ivec2 p, float v) {
-    ivec2 lo = p & 1;
-    ivec2 md = (p >> 1) & 1;
-    ivec2 hi = (p >> 2) & 1;
-    float t = float(
-      (lo.x==0 ? (lo.y==0 ? 0:3) : (lo.y==0 ? 2:1)) +
-      ((md.x==0 ? (md.y==0 ? 0:3) : (md.y==0 ? 2:1)) << 2) +
-      ((hi.x==0 ? (hi.y==0 ? 0:3) : (hi.y==0 ? 2:1)) << 4)
-    ) / 64.0;
-    return step(t, v);
+  // Tone field sampled at a single point (used once per dot, at its cell
+  // center) — a true variable-radius halftone instead of a per-pixel
+  // ordered-dither pattern. Returns coverage plus an "energy" value used to
+  // tint dots toward the accent color near live interaction.
+  float tone(vec2 uv, float d, vec2 toM, out float energy){
+    float ambientPush = smoothstep(0.4, 0.0, d) * 0.42 * uMouseActive;
+    float heldPush = smoothstep(0.95, 0.0, d) * uMouseDown * 1.9;
+    vec2 dir = normalize(toM + 1e-5);
+    vec2 warped = uv + dir * (ambientPush + heldPush);
+
+    // Primary wave: wider spatial spread so motion reads across the whole
+    // canvas rather than one soft blob in a corner.
+    vec2 p = vec2(warped.x * 0.85, warped.y * 1.55) + vec2(uTime * 0.11, uTime * 0.065);
+    float n = fbm(p);
+
+    // Secondary, faster, finer layer adds visual complexity/energy on top
+    // of the primary wave — still sampled once per dot, so it stays smooth.
+    vec2 p2 = vec2(warped.x * 2.1, warped.y * 2.6) + vec2(-uTime * 0.22, uTime * 0.16);
+    float n2 = snoise(p2);
+    n += n2 * 0.28;
+
+    // Punchier contrast: a tighter band makes the dot swings more graphic.
+    float g = smoothstep(0.0, 0.62, n);
+    g = pow(g, 1.15);
+
+    float ring = sin(d * 20.0 - uTime * 4.2) * 0.5 + 0.5;
+    float ringMask = smoothstep(0.62, 0.0, d) * uMouseActive * (0.35 + 0.9 * uMouseDown);
+    g += ring * ringMask * 0.8;
+
+    float shock = smoothstep(0.95, 0.0, d) * uMouseDown;
+    g += shock * 0.6;
+
+    energy = clamp(ringMask * ring + shock * 1.2 + ambientPush * 0.6, 0.0, 1.0);
+
+    return clamp(g * uStrength, 0.0, 1.0);
   }
 
   void main(){
     vec2 frag = gl_FragCoord.xy;
-    vec2 uv = (frag - 0.5 * uResolution) / uResolution.y;
 
-    // Mouse in same normalized space
+    // Sample the tone field once per dot cell (at the cell's own center) so
+    // every dot gets one consistent radius — a true variable-radius halftone
+    // instead of a per-pixel ordered-dither pattern.
+    vec2 cell = floor(frag / uDotSize);
+    vec2 cellCenterPx = (cell + 0.5) * uDotSize;
+    vec2 uv = (cellCenterPx - 0.5 * uResolution) / uResolution.y;
     vec2 mouseUv = (uMouse - 0.5 * uResolution) / uResolution.y;
     vec2 toM = uv - mouseUv;
     float d = length(toM);
 
-    // Ambient hover ripple: clearly visible under cursor
-    float ambientPush = smoothstep(0.35, 0.0, d) * 0.35 * uMouseActive;
-    // Hold: large, obvious outward push
-    float heldPush = smoothstep(0.90, 0.0, d) * uMouseDown * 1.6;
-    vec2 dir = normalize(toM + 1e-5);
-    vec2 warped = uv + dir * (ambientPush + heldPush);
+    float energy = 0.0;
+    float g = tone(uv, d, toM, energy);
 
-    // Low-frequency wave, larger travelling amplitude
-    vec2 p = vec2(warped.x * 0.55, warped.y * 1.15) + vec2(uTime * 0.06, uTime * 0.03);
-    float n = fbm(p);
+    // Soft, anti-aliased circular dot whose radius tracks the tone field.
+    // sqrt(g) keeps perceived coverage roughly linear with tone.
+    float maxR = uDotSize * 0.48;
+    float r = maxR * sqrt(g);
+    float distPx = length(frag - cellCenterPx);
+    float edge = uDotSize * 0.14;
+    float dot = 1.0 - smoothstep(r - edge, r + edge, distPx);
 
-    // Higher contrast between low-density and crest regions
-    float g = smoothstep(0.05, 0.75, n);
-    g = pow(g, 1.5);
-
-    // Wave ripple radiating from cursor — visible even without click
-    float ring = sin(d * 22.0 - uTime * 3.2) * 0.5 + 0.5;
-    float ringMask = smoothstep(0.55, 0.0, d) * uMouseActive * (0.25 + 0.75 * uMouseDown);
-    g += ring * ringMask * 0.65;
-
-    // Strong expanding shockwave on hold
-    float shock = smoothstep(0.90, 0.0, d) * uMouseDown;
-    g += shock * 0.45;
-
-    g = clamp(g * uStrength, 0.0, 1.0);
-
-    // Dot cell — quantize fragment to dot grid
-    vec2 cell = floor(frag / uDotSize);
-    float dither = threshold(ivec2(cell), g);
-
-    vec3 col = mix(uBg, uFg, dither);
+    vec3 col = mix(uBg, uFg, dot);
+    // Dots near live interaction glow toward the accent color.
+    col = mix(col, uAccent, energy * dot * 0.6);
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -169,8 +187,9 @@ function Quad({
       uMouseActive: { value: 0 },
       uBg: { value: new THREE.Color("#0A0A0A") },
       uFg: { value: new THREE.Color("#EDEDED") },
+      uAccent: { value: new THREE.Color("#D4A574") },
       uStrength: { value: strength },
-      uDotSize: { value: 3.5 },
+      uDotSize: { value: 5.5 },
     }),
     [strength]
   );
@@ -183,6 +202,7 @@ function Quad({
     u.uResolution.value.set(size.width * dpr, size.height * dpr);
     u.uBg.value.copy(colors.current.bg);
     u.uFg.value.copy(colors.current.fg);
+    u.uAccent.value.copy(colors.current.accent);
     // ease mouseDown 0..1 (~300ms up / ~500ms down)
     const target = mouseDown.current;
     const speed = target > u.uMouseDown.value ? 0.14 : 0.08;
@@ -190,7 +210,7 @@ function Quad({
     // ease continuous mouseActive presence
     u.uMouseActive.value += (mouseActive.current - u.uMouseActive.value) * 0.12;
     u.uMouse.value.set(mouse.current.x * dpr, (size.height - mouse.current.y) * dpr);
-    u.uDotSize.value = window.innerWidth < 640 ? 3.0 : 3.5;
+    u.uDotSize.value = window.innerWidth < 640 ? 4.5 : 5.5;
   });
 
   // silence unused warning

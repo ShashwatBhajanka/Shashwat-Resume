@@ -255,11 +255,11 @@ function CarouselFlipCard({ card, onClick }: { card: Card; onClick: () => void }
           className="absolute inset-x-0 top-0 h-1"
           style={{
             background: `linear-gradient(90deg, ${card.accent}, color-mix(in oklab, ${card.accent} 40%, transparent))`,
+            transformOrigin: "left center",
           }}
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.1 }}
-          style={{ transformOrigin: "left center" }}
         />
       </motion.div>
     </motion.button>
@@ -415,11 +415,6 @@ export function App() {
                   </div>
                   <div className="mt-3 flex items-center gap-2">
                     <span className="label-tag">{s.label}</span>
-                    {s.note && (
-                      <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: "var(--accent)" }}>
-                        · {s.note}
-                      </span>
-                    )}
                   </div>
                 </div>
               ))}
@@ -559,7 +554,7 @@ export function App() {
                 <Reveal><SectionLabel>Portfolio</SectionLabel></Reveal>
                 <Reveal delay={0.05}>
                   <h2 className="display-tight text-text" style={{ fontSize: "clamp(40px, 7vw, 88px)" }}>
-                    Achievements &amp;<br />Certifications
+                    Achievements<br />&amp; Certifications
                   </h2>
                 </Reveal>
               </div>

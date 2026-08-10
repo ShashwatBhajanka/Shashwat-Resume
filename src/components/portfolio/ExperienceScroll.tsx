@@ -21,6 +21,17 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Scales the display font size down for longer words so a single word never
+// overflows the visual panel and has to be force-broken mid-word.
+function fitOrgFontSize(text: string): string {
+  const longest = text.split(/\s+/).reduce((max, w) => Math.max(max, w.length), 1);
+  const scale = Math.min(1, 7 / longest);
+  const min = Math.round(36 * scale);
+  const max = Math.round(80 * scale);
+  const vw = (6 * scale).toFixed(2);
+  return `clamp(${min}px, ${vw}vw, ${max}px)`;
+}
+
 function useReducedMotion() {
   const [r, setR] = useState(false);
   useEffect(() => {
@@ -307,10 +318,11 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
                   transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
                   className="display-tight text-left text-text leading-[1.1]"
                   style={{
-                    fontSize: "clamp(40px, 7vw, 96px)",
+                    fontSize: fitOrgFontSize(current.org.split("·")[0].trim()),
                     letterSpacing: "-0.03em",
                     lineHeight: 1,
-                    overflowWrap: "break-word",
+                    overflowWrap: "normal",
+                    wordBreak: "normal",
                     hyphens: "auto",
                   }}
                 >

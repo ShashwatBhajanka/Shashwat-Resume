@@ -94,7 +94,7 @@ export function Carousel3D<T>({
     };
 
     const onResize = () => {
-      clearTimeout(resizeTimer);
+      if (resizeTimer !== null) clearTimeout(resizeTimer);
       resizeTimer = setTimeout(doSnap, 200);
     };
 
@@ -233,7 +233,7 @@ function SnapRow<T>({
 }) {
   return (
     <div
-      className="relative -mx-5 md:-mx-8"
+      className="relative"
       style={{
         scrollSnapType: "x mandatory",
         overflowX: "auto",

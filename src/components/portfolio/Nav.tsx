@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { A11yMenu } from "./A11yMenu";
 
 const SECTIONS = [
@@ -15,6 +15,22 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("home");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) setMobileOpen(false);
+    };
+    const onEsc = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false);
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     const initial = (document.documentElement.getAttribute("data-theme") as "dark" | "light") || "dark";
@@ -51,6 +67,7 @@ export function Nav() {
 
   const jump = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
+    setMobileOpen(false);
     const el = document.getElementById(id);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 56;
@@ -60,15 +77,20 @@ export function Nav() {
 
   return (
     <nav
-      className="fixed inset-x-0 top-0 z-50 h-12 transition-colors duration-300"
+      ref={navRef}
+      className="fixed inset-x-0 top-0 z-50 transition-colors duration-300"
       style={{ backgroundColor: "var(--bg)", backdropFilter: "blur(10px)", borderBottom: "1px solid var(--border-soft)" }}
     >
-      <div className="mx-auto flex h-full max-w-[880px] items-center justify-between px-5 md:px-7">
-        <a href="#home" onClick={jump("home")} className="text-xs text-text-soft hover:text-text transition">
+      <div className="mx-auto flex h-12 max-w-[880px] items-center justify-between px-5 md:px-7">
+        <a
+          href="#home"
+          onClick={jump("home")}
+          className="min-w-0 truncate text-xs text-text-soft hover:text-text transition"
+        >
           Shashwat Bhajanka
         </a>
         <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 overflow-x-auto">
+          <div className="hidden items-center gap-1 md:flex">
             {SECTIONS.slice(1).map((s) => (
               <a
                 key={s.id}
@@ -84,16 +106,45 @@ export function Nav() {
           <button
             aria-label="Toggle theme"
             onClick={toggleTheme}
-            className="ml-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border hover:text-accent transition"
+            className="ml-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-md border hover:text-accent transition md:ml-2 md:h-7 md:w-7"
             style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}
           >
             {theme === "dark" ? <Sun size={13} /> : <Moon size={13} />}
           </button>
-          <div className="ml-1 shrink-0">
+          <div className="shrink-0">
             <A11yMenu />
           </div>
+          <button
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((o) => !o)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border hover:text-accent transition md:hidden"
+            style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}
+          >
+            {mobileOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
         </div>
       </div>
+      {mobileOpen && (
+        <div
+          role="menu"
+          className="border-t md:hidden"
+          style={{ borderColor: "var(--border-soft)", background: "var(--bg)" }}
+        >
+          {SECTIONS.slice(1).map((s) => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              onClick={jump(s.id)}
+              role="menuitem"
+              className="flex h-11 items-center px-5 text-sm transition-colors"
+              style={{ color: active === s.id ? "var(--accent)" : "var(--text-soft)" }}
+            >
+              {s.label}
+            </a>
+          ))}
+        </div>
+      )}
     </nav>
   );
 }

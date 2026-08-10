@@ -65,7 +65,7 @@ export function A11yMenu() {
         aria-label="Accessibility settings"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-7 w-7 items-center justify-center rounded-md border hover:text-accent transition"
+        className="flex h-11 w-11 items-center justify-center rounded-md border hover:text-accent transition md:h-7 md:w-7"
         style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}
       >
         <Accessibility size={13} />
@@ -73,7 +73,7 @@ export function A11yMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-9 z-50 w-64 border p-1"
+          className="absolute right-0 top-full z-50 mt-2 w-64 border p-1"
           style={{
             background: "var(--bg-elevated)",
             borderColor: "var(--border)",
