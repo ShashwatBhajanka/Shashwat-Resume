@@ -8,7 +8,7 @@ import { SkillBar } from "@/components/portfolio/SkillBar";
 import { BackToTop } from "@/components/portfolio/BackToTop";
 import { ImagePlaceholder } from "@/components/portfolio/ImagePlaceholder";
 import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
-import { PinnedImageHeadline } from "@/components/portfolio/PinnedImageHeadline";
+
 import { Carousel3D } from "@/components/portfolio/Carousel3D";
 import { ExperienceScroll } from "@/components/portfolio/ExperienceScroll";
 
@@ -312,6 +312,14 @@ const CLUBS: ClubCardData[] = [
     image: "/data.png",
   },
   {
+    role: "Co-Director of Builders",
+    org: "AI4All",
+    desc: "Building and shipping products using AI, while teaching students — including those new to AI — how to use AI tools to create real products.",
+    tags: ["AI", "Teaching", "Product Building"],
+    meta: "Present",
+    image: "/AI4All.png",
+  },
+  {
     role: "Full Stack Developer",
     org: "Ashoka Ministry of Technology",
     desc: "Build and maintain university services used by 3,000+ students — applying web dev and analytics to identify real student needs.",
@@ -422,9 +430,8 @@ export function App() {
           </Reveal>
         </section>
 
-        <Divider />
-        <PinnedImageHeadline />
-        <Divider />
+
+
 
         <section id="education" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
           <Reveal><SectionLabel>Education</SectionLabel></Reveal>
@@ -625,10 +632,10 @@ export function App() {
               </div>
               <div className="text-center">
                 <span className="inline-block border px-2.5 py-1 font-mono text-[11px] font-semibold text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
-                  Built with ✦ by Shashwat Bhajanka
+                  Built by Shashwat Bhajanka
                 </span>
                 <span className="ml-2 inline-block border px-2.5 py-1 font-mono text-[10px] font-semibold text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
-                  Last updated · July 2026
+                  Last updated · September 2026
                 </span>
               </div>
             </div>
