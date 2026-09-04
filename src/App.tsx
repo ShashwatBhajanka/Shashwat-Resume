@@ -53,6 +53,9 @@ const EDUCATION = [
       "Calculus",
       "Intro to Computer Science (B+)",
       "Discrete Mathematics (A−)",
+      "Data Structures & Algorithms(current)",
+      "Probability & statistics",
+      "Accounting & financial statements"
     ],
     image: "/ashoka.png",
   },
@@ -154,19 +157,19 @@ const CERTIFICATIONS: Card[] = [
     desc: "Add details for this certification.", isPlaceholder: true,
     accent: "#B45309",
     image: "/Certifications/Python.png" },
-  { emoji: "💰", title: "Financial Mathematics", org: "add organisation",
+  { emoji: "💰", title: "Financial Mathematics", org: "Udemy",
     desc: "Add details for this certification.", isPlaceholder: true,
     accent: "#4F46E5",
     image: "/Certifications/FinancialMath.png" },
-  { emoji: "📊", title: "Econometrics", org: "add organisation",
+  { emoji: "📊", title: "Econometrics", org: "Udemy",
     desc: "Add details for this certification.", isPlaceholder: true,
     accent: "#7C3AED",
     image: "/Certifications/Econometrics.png" },
-  { emoji: "🔬", title: "Data Science", org: "add organisation",
+  { emoji: "🔬", title: "Data Science", org: "Udemy",
     desc: "Add details for this certification.", isPlaceholder: true,
     accent: "#0891B2",
     image: "/Certifications/DataSceince.png" },
-  { emoji: "🚀", title: "Entrepreneurship", org: "add organisation",
+  { emoji: "🚀", title: "Entrepreneurship", org: "Clever Harvey",
     desc: "Add details for this certification.", isPlaceholder: true,
     accent: "#C2410C",
     image: "/Certifications/Entreprenureship.png" },
@@ -530,8 +533,8 @@ export function App() {
             <Reveal>
               <div className="label-tag mb-5">Tools</div>
               <div className="flex flex-wrap gap-2">
-                {["Excel", "Google Data Studio", "Cloud Architecture"].map((t) => (
-                  <span key={t} className="border px-3 py-1.5 text-xs text-text" style={{ borderColor: "var(--border)" }}>{t}</span>
+                {["Excel", "Google Data Studio", "Claude Code", "Pyhton Libraries", "Orange", "Openrouter", "REST APIs"].map((t) => (
+                  <span key={t} className="border px-4 py-2 text-sm text-text" style={{ borderColor: "var(--border)" }}>{t}</span>
                 ))}
               </div>
             </Reveal>
@@ -539,11 +542,11 @@ export function App() {
               <div className="label-tag mb-5">Competencies</div>
               <div className="flex flex-wrap gap-2">
                 {[
-                  ["📊", "Data Analysis"], ["📈", "Statistical Modelling"], ["🧠", "Analytical Thinking"],
+                  ["📊", "Data Analysis"], ,["💻","Web App Developement"],["📈", "Statistical Modelling"], ["🧠", "Analytical Thinking"],
                   ["🔍", "Critical Thinking"], ["📋", "Project Management"], ["🤝", "Team Collaboration"],
                   ["💡", "Problem Solving"],
                 ].map(([e, l]) => (
-                  <span key={l} className="inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs text-text" style={{ borderColor: "var(--border)" }}>
+                  <span key={l} className="inline-flex items-center gap-1.5 border px-4 py-2 text-sm text-text" style={{ borderColor: "var(--border)" }}>
                     <span>{e}</span>{l}
                   </span>
                 ))}
