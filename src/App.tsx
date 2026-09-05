@@ -120,9 +120,8 @@ type Card = {
   title: string;
   year?: string;
   org: string;
-  desc: string;
+  desc?: string;
   accent: string;
-  isPlaceholder?: boolean;
   image?: string;
 };
 
@@ -145,6 +144,9 @@ const ACHIEVEMENTS: Card[] = [
 ];
 
 const CERTIFICATIONS: Card[] = [
+  { emoji: "🤖", title: "Claude Code in Action", year: "2026", org: "Anthropic",
+    accent: "#C2692C",
+    image: "/Certifications/ClaudeCert.png" },
   { emoji: "🤖", title: "Machine Learning Basics", year: "2024", org: "Sung Kyun Kwan University",
     desc: "Completed an introductory course on Machine Learning. Learnt and practiced concepts such as supervised learning, regression, and classification models.",
     accent: "#0369A1",
@@ -154,23 +156,18 @@ const CERTIFICATIONS: Card[] = [
     accent: "#047857",
     image: "/Certifications/SQL.png" },
   { emoji: "🐍", title: "Python — 100 Days of Code", year: "2024", org: "Udemy",
-    desc: "Add details for this certification.", isPlaceholder: true,
     accent: "#B45309",
     image: "/Certifications/Python.png" },
-  { emoji: "💰", title: "Financial Mathematics", org: "Udemy",
-    desc: "Add details for this certification.", isPlaceholder: true,
+  { emoji: "💰", title: "Fundamental Financial Mathematics", year:"2024", org: "Udemy",
     accent: "#4F46E5",
     image: "/Certifications/FinancialMath.png" },
-  { emoji: "📊", title: "Econometrics", org: "Udemy",
-    desc: "Add details for this certification.", isPlaceholder: true,
+  { emoji: "📊", title: "Introduction to Econometrics", year:"2023",org: "Udemy",
     accent: "#7C3AED",
     image: "/Certifications/Econometrics.png" },
-  { emoji: "🔬", title: "Data Science", org: "Udemy",
-    desc: "Add details for this certification.", isPlaceholder: true,
+  { emoji: "🔬", title: "Data Science",  year:"2023", org: "Udemy",
     accent: "#0891B2",
     image: "/Certifications/DataSceince.png" },
-  { emoji: "🚀", title: "Entrepreneurship", org: "Clever Harvey",
-    desc: "Add details for this certification.", isPlaceholder: true,
+  { emoji: "🚀", title: "Entrepreneurship", year:"2021", org: "Clever Harvey",
     accent: "#C2410C",
     image: "/Certifications/Entreprenureship.png" },
 ];
@@ -204,15 +201,9 @@ function CarouselFlipCard({ card, onClick }: { card: Card; onClick: () => void }
           >
             {card.emoji}
           </motion.div>
-          {card.isPlaceholder ? (
-            <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: card.accent }}>
-              placeholder
-            </span>
-          ) : (
-            <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
-              {card.year ?? ""}
-            </span>
-          )}
+          <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
+            {card.year ?? ""}
+          </span>
         </div>
         <motion.div
           className="mt-8"
@@ -700,9 +691,11 @@ export function App() {
                  <h3 className="text-xl md:text-2xl font-semibold text-text display-tight leading-tight">
                    {selectedCard.title}
                  </h3>
-                 <p className="mt-4 text-sm leading-relaxed text-text-soft">
-                   {selectedCard.desc}
-                 </p>
+{selectedCard.desc && (
+                   <p className="mt-4 text-sm leading-relaxed text-text-soft">
+                     {selectedCard.desc}
+                   </p>
+                 )}
                </div>
                <div className="absolute inset-x-0 top-0 h-[3px]" style={{
                  background: `linear-gradient(90deg, ${selectedCard.accent}, color-mix(in oklab, ${selectedCard.accent} 40%, transparent))`,
