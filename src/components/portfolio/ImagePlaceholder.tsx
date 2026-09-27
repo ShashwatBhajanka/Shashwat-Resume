@@ -22,7 +22,7 @@ export function ImagePlaceholder({
     >
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-text-muted">
         <Camera size={16} strokeWidth={1.5} />
-        <span className="font-mono text-[9px] uppercase tracking-widest">{label}</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest">{label}</span>
       </div>
     </div>
   );

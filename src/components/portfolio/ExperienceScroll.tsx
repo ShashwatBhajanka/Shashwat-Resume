@@ -200,15 +200,15 @@ export function ExperienceScroll({ entries }: { entries: ExperienceEntry[] }) {
       style={{ height: `${N * 90 + 100}vh` }}
     >
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <div className="mx-auto grid w-full max-w-[1100px] grid-cols-[80px_1fr_1.1fr] items-center gap-10 px-5 md:px-8">
+        <div className="mx-auto grid w-full max-w-[1100px] grid-cols-[120px_1fr_1.1fr] items-center gap-10 px-5 md:px-8">
           {/* Progress rail */}
           <div className="relative flex h-[60vh] flex-col">
             <div className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
               step
             </div>
             <div
-              className="display-tight mt-2 text-text"
-              style={{ fontSize: "clamp(28px, 3vw, 44px)" }}
+              className="font-dots leading-none mt-2 whitespace-nowrap text-text"
+              style={{ fontSize: "clamp(22px, 2.2vw, 30px)" }}
             >
               {String(active + 1).padStart(2, "0")}
               <span className="text-text-muted"> / {String(N).padStart(2, "0")}</span>

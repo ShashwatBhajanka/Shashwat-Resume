@@ -19,13 +19,13 @@ export function SkillBar({ name, level, pct }: { name: string; level: string; pc
   return (
     <div ref={ref} className="py-2.5">
       <div className="mb-1.5 flex items-baseline justify-between">
-        <span className="text-sm text-text">{name}</span>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">{level}</span>
+        <span className="font-mono text-[13px] text-text">{name}</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest text-text-muted">{level}</span>
       </div>
-      <div className="h-[2px] w-full overflow-hidden bg-border-soft">
+      <div className="h-[2px] w-full overflow-hidden">
         <div
-          className="h-full bg-accent transition-[width] duration-[1400ms] ease-out"
-          style={{ width: `${w}%` }}
+          className="h-full origin-left bg-accent transition-transform duration-[1400ms] ease-out"
+          style={{ transform: `scaleX(${w / 100})` }}
         />
       </div>
     </div>

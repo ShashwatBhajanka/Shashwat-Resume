@@ -9,20 +9,23 @@ export function Carousel3D<T>({
   items,
   renderCard,
   label,
+  header,
 }: {
   items: T[];
   renderCard: (item: T, index: number) => ReactNode;
   label?: string;
+  /** Heading shown with the cards; stays visible while the carousel is pinned. */
+  header?: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress, scrollY } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
   const total = items.length;
-  // Total scroll height: give roughly 60vh per card + one viewport for the pin.
-  const heightVh = 100 + Math.max(1, total) * 55;
+  // Total scroll height: roughly 35vh per card + one viewport for the pin.
+  const heightVh = 100 + Math.max(1, total) * 35;
 
   const reduced =
     typeof window !== "undefined" &&
@@ -81,13 +84,12 @@ export function Carousel3D<T>({
       setTimeout(clearSnap, 500);
     };
 
-    const onScroll = () => {
-      const delta = Math.abs(window.scrollY - lastScrollY);
-      if (delta > 0.5) {
-        // Genuine user scroll activity — release snap lock early so next
-        // debounced snap can fire instead of being blocked by isSnapping.
+    const onScroll = (y: number) => {
+      if (Math.abs(y - lastScrollY) > 0.5) {
+        // Genuine user scroll activity: release the snap lock early so the
+        // next debounced snap can fire instead of being blocked.
         isSnapping = false;
-        lastScrollY = window.scrollY;
+        lastScrollY = y;
       }
       clearDebounce();
       debounceTimer = setTimeout(doSnap, 120);
@@ -98,16 +100,16 @@ export function Carousel3D<T>({
       resizeTimer = setTimeout(doSnap, 200);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const unsub = scrollY.on("change", onScroll);
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      unsub();
       window.removeEventListener("resize", onResize);
       clearDebounce();
       if (resizeTimer !== null) clearTimeout(resizeTimer);
     };
-  }, [scrollYProgress, total, reduced]);
+  }, [scrollYProgress, scrollY, total, reduced]);
 
   // Mobile / reduced-motion: horizontal scroll-snap fallback
   return (
@@ -115,7 +117,10 @@ export function Carousel3D<T>({
       {/* Desktop pinned 3D carousel */}
       <div className="hidden md:block">
         {reduced ? (
-          <SnapRow items={items} renderCard={renderCard} label={label} />
+          <>
+            <HeaderRow>{header}</HeaderRow>
+            <SnapRow items={items} renderCard={renderCard} label={label} />
+          </>
         ) : (
           <section
             ref={ref}
@@ -123,16 +128,19 @@ export function Carousel3D<T>({
             style={{ height: `${heightVh}vh` }}
             aria-label={label}
           >
-            <div
-              className="sticky top-0 flex h-screen items-center overflow-hidden"
-              style={{ perspective: "1400px" }}
-            >
+            {/* Pinned just under the nav. The heading and cards are centred
+                together as one block, so any spare height is split evenly
+                above and below instead of piling up under the cards. */}
+            <div className="sticky top-12 flex h-[calc(100dvh-3rem)] flex-col justify-center overflow-hidden py-6">
+              <HeaderRow>{header}</HeaderRow>
+              <div className="mt-6 flex shrink-0 items-start" style={{ perspective: "1400px" }}>
               <motion.div
                 className="flex will-change-transform"
                 style={{
                   gap: `${GAP}px`,
-                  paddingLeft: `calc(50vw - ${CARD_W / 2}px)`,
-                  paddingRight: `calc(50vw - ${CARD_W / 2}px)`,
+                  // Start the row on the page's content edge, not the viewport centre.
+                  paddingLeft: "max(2rem, calc((100% - 1100px) / 2 + 2rem))",
+                  paddingRight: "2rem",
                   transformStyle: "preserve-3d",
                   x: useTransform(
                     scrollYProgress,
@@ -152,6 +160,7 @@ export function Carousel3D<T>({
                   </CarouselCard>
                 ))}
               </motion.div>
+              </div>
             </div>
           </section>
         )}
@@ -159,10 +168,16 @@ export function Carousel3D<T>({
 
       {/* Mobile fallback */}
       <div className="md:hidden">
+        <HeaderRow>{header}</HeaderRow>
         <SnapRow items={items} renderCard={renderCard} label={label} />
       </div>
     </>
   );
+}
+
+function HeaderRow({ children }: { children?: ReactNode }) {
+  if (!children) return null;
+  return <div className="mx-auto w-full max-w-[1100px] shrink-0 px-5 md:px-8">{children}</div>;
 }
 
 function CarouselCard({
@@ -193,25 +208,20 @@ function CarouselCard({
   const zIndex = useTransform(activeIdx, (a) =>
     Math.round(100 - Math.abs(index - a) * 5)
   );
-  const shadow = useTransform(activeIdx, (a) => {
-    const d = Math.min(Math.abs(index - a), 3);
-    const blur = 30 - d * 8;
-    const alpha = Math.max(0.2, 0.45 - d * 0.1);
-    return `0 20px ${blur}px rgba(0,0,0,${alpha})`;
-  });
 
   return (
     <motion.div
       className="shrink-0 overflow-hidden relative"
       style={{
         width: CARD_W,
-        height: CARD_H,
+        // Original size; only shrinks on short viewports so the pinned
+        // heading and card both fit.
+        height: `min(${CARD_H}px, calc(100dvh - 11rem))`,
         scale,
         rotateY,
         opacity,
         zIndex,
-        boxShadow: shadow,
-        borderRadius: 12,
+        borderRadius: 2,
         border: "1px solid var(--border)",
         transformStyle: "preserve-3d",
         pointerEvents: "auto",
@@ -242,21 +252,20 @@ function SnapRow<T>({
       aria-label={label}
     >
       <div
-        className="flex px-5 md:px-8"
+        className="flex px-5 pt-6 md:px-8"
         style={{ gap: `${GAP}px`, paddingBottom: 8 }}
       >
         {items.map((item, i) => (
           <div
             key={i}
-            className="shrink-0 overflow-hidden"
+            className="relative shrink-0 overflow-hidden"
             style={{
-               width: Math.min(CARD_W, 320),
+               width: Math.min(CARD_W, 300),
                height: CARD_H,
                scrollSnapAlign: "center",
                scrollSnapStop: "always",
-               borderRadius: 12,
+               borderRadius: 2,
                border: "1px solid var(--border)",
-               boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
              }}
           >
             {renderCard(item, i)}

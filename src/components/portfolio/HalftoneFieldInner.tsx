@@ -34,14 +34,16 @@ const vertex = /* glsl */ `
   }
 `;
 
+// Ripple trail: recent pointer positions that each emit an expanding wave.
+const TRAIL = 16;
+const RIPPLE_LIFE = 1.8;
+
 const fragment = /* glsl */ `
   precision highp float;
   varying vec2 vUv;
   uniform vec2 uResolution;
   uniform float uTime;
-  uniform vec2 uMouse;
-  uniform float uMouseDown;
-  uniform float uMouseActive;
+  uniform vec4 uTrail[${TRAIL}];
   uniform vec3 uBg;
   uniform vec3 uFg;
   uniform vec3 uAccent;
@@ -85,86 +87,69 @@ const fragment = /* glsl */ `
     return s;
   }
 
-  // Tone field sampled at a single point (used once per dot, at its cell
-  // center) — a true variable-radius halftone instead of a per-pixel
-  // ordered-dither pattern. Returns coverage plus an "energy" value used to
-  // tint dots toward the accent color near live interaction.
-  float tone(vec2 uv, float d, vec2 toM, out float energy){
-    float ambientPush = smoothstep(0.4, 0.0, d) * 0.42 * uMouseActive;
-    float heldPush = smoothstep(0.95, 0.0, d) * uMouseDown * 1.9;
-    vec2 dir = normalize(toM + 1e-5);
-    vec2 warped = uv + dir * (ambientPush + heldPush);
-
-    // Primary wave: wider spatial spread so motion reads across the whole
-    // canvas rather than one soft blob in a corner.
-    vec2 p = vec2(warped.x * 0.85, warped.y * 1.55) + vec2(uTime * 0.11, uTime * 0.065);
+  // Ambient tone field, sampled once per dot at its cell center.
+  float tone(vec2 uv){
+    vec2 p = vec2(uv.x * 0.85, uv.y * 1.55) + vec2(uTime * 0.11, uTime * 0.065);
     float n = fbm(p);
-
-    // Secondary, faster, finer layer adds visual complexity/energy on top
-    // of the primary wave — still sampled once per dot, so it stays smooth.
-    vec2 p2 = vec2(warped.x * 2.1, warped.y * 2.6) + vec2(-uTime * 0.22, uTime * 0.16);
-    float n2 = snoise(p2);
-    n += n2 * 0.28;
-
-    // Punchier contrast: a tighter band makes the dot swings more graphic.
+    vec2 p2 = vec2(uv.x * 2.1, uv.y * 2.6) + vec2(-uTime * 0.22, uTime * 0.16);
+    n += snoise(p2) * 0.28;
     float g = smoothstep(0.0, 0.62, n);
     g = pow(g, 1.15);
-
-    float ring = sin(d * 20.0 - uTime * 4.2) * 0.5 + 0.5;
-    float ringMask = smoothstep(0.62, 0.0, d) * uMouseActive * (0.35 + 0.9 * uMouseDown);
-    g += ring * ringMask * 0.8;
-
-    float shock = smoothstep(0.95, 0.0, d) * uMouseDown;
-    g += shock * 0.6;
-
-    energy = clamp(ringMask * ring + shock * 1.2 + ambientPush * 0.6, 0.0, 1.0);
-
     return clamp(g * uStrength, 0.0, 1.0);
+  }
+
+  // Coverage of the variable-radius halftone dot under a (possibly warped)
+  // pixel. Warping the lookup — not the tone — is what makes the ripple read
+  // as liquid glass: the dot grid itself bends.
+  float dotAt(vec2 frag){
+    vec2 cell = floor(frag / uDotSize);
+    vec2 c = (cell + 0.5) * uDotSize;
+    vec2 uv = (c - 0.5 * uResolution) / uResolution.y;
+    float r = uDotSize * 0.48 * sqrt(tone(uv));
+    float e = uDotSize * 0.14;
+    return 1.0 - smoothstep(r - e, r + e, length(frag - c));
   }
 
   void main(){
     vec2 frag = gl_FragCoord.xy;
 
-    // Sample the tone field once per dot cell (at the cell's own center) so
-    // every dot gets one consistent radius — a true variable-radius halftone
-    // instead of a per-pixel ordered-dither pattern.
-    vec2 cell = floor(frag / uDotSize);
-    vec2 cellCenterPx = (cell + 0.5) * uDotSize;
-    vec2 uv = (cellCenterPx - 0.5 * uResolution) / uResolution.y;
-    vec2 mouseUv = (uMouse - 0.5 * uResolution) / uResolution.y;
-    vec2 toM = uv - mouseUv;
-    float d = length(toM);
-
+    // Ripple waves emitted along the pointer trail.
+    vec2 disp = vec2(0.0);
     float energy = 0.0;
-    float g = tone(uv, d, toM, energy);
+    for (int i = 0; i < ${TRAIL}; i++) {
+      vec4 t = uTrail[i];
+      if (t.z > ${RIPPLE_LIFE.toFixed(1)}) continue;
+      vec2 d = frag - t.xy;
+      float dl = length(d);
+      float x = dl / uResolution.y - t.z * 0.42;
+      float env = exp(-x * x * 260.0) * exp(-t.z * 2.4) * t.w;
+      disp += (d / max(dl, 1.0)) * sin(x * 70.0) * env * uResolution.y * 0.012;
+      energy += env;
+    }
+    energy = clamp(energy, 0.0, 1.0);
 
-    // Soft, anti-aliased circular dot whose radius tracks the tone field.
-    // sqrt(g) keeps perceived coverage roughly linear with tone.
-    float maxR = uDotSize * 0.48;
-    float r = maxR * sqrt(g);
-    float distPx = length(frag - cellCenterPx);
-    float edge = uDotSize * 0.14;
-    float dot = 1.0 - smoothstep(r - edge, r + edge, distPx);
+    // Chromatic split only where a wave is actually bending the field.
+    float dg = dotAt(frag + disp);
+    vec3 cov = vec3(dg);
+    if (energy > 0.02) {
+      cov.r = dotAt(frag + disp * 1.1);
+      cov.b = dotAt(frag + disp * 0.9);
+    }
+    vec3 col = mix(uBg, uFg, cov);
+    col = mix(col, uAccent, energy * dg * 0.55);
 
-    vec3 col = mix(uBg, uFg, dot);
-    // Dots near live interaction glow toward the accent color.
-    col = mix(col, uAccent, energy * dot * 0.6);
     gl_FragColor = vec4(col, 1.0);
   }
 `;
 
+type Ripple = { x: number; y: number; age: number; amp: number };
+
 function Quad({
   strength,
-  interactive,
-  mouse,
-  mouseDown,
-  mouseActive,
+  trail,
 }: {
   strength: number;
-  interactive: boolean;
-  mouse: React.MutableRefObject<{ x: number; y: number }>;
-  mouseDown: React.MutableRefObject<number>;
-  mouseActive: React.MutableRefObject<number>;
+  trail: React.MutableRefObject<Ripple[]>;
 }) {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const { size } = useThree();
@@ -182,9 +167,7 @@ function Quad({
     () => ({
       uTime: { value: 0 },
       uResolution: { value: new THREE.Vector2(1, 1) },
-      uMouse: { value: new THREE.Vector2(-9999, -9999) },
-      uMouseDown: { value: 0 },
-      uMouseActive: { value: 0 },
+      uTrail: { value: Array.from({ length: TRAIL }, () => new THREE.Vector4(0, 0, 99, 0)) },
       uBg: { value: new THREE.Color("#0A0A0A") },
       uFg: { value: new THREE.Color("#EDEDED") },
       uAccent: { value: new THREE.Color("#D4A574") },
@@ -194,8 +177,9 @@ function Quad({
     [strength]
   );
 
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
     if (!mat.current) return;
+    const dt = Math.min(rawDt, 0.05);
     const u = mat.current.uniforms;
     if (!reduced && !classReduced()) u.uTime.value += dt;
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -203,18 +187,14 @@ function Quad({
     u.uBg.value.copy(colors.current.bg);
     u.uFg.value.copy(colors.current.fg);
     u.uAccent.value.copy(colors.current.accent);
-    // ease mouseDown 0..1 (~300ms up / ~500ms down)
-    const target = mouseDown.current;
-    const speed = target > u.uMouseDown.value ? 0.14 : 0.08;
-    u.uMouseDown.value += (target - u.uMouseDown.value) * speed;
-    // ease continuous mouseActive presence
-    u.uMouseActive.value += (mouseActive.current - u.uMouseActive.value) * 0.12;
-    u.uMouse.value.set(mouse.current.x * dpr, (size.height - mouse.current.y) * dpr);
+
+    const vecs = u.uTrail.value as THREE.Vector4[];
+    trail.current.forEach((r, i) => {
+      r.age += dt;
+      vecs[i].set(r.x * dpr, (size.height - r.y) * dpr, r.age, r.amp);
+    });
     u.uDotSize.value = window.innerWidth < 640 ? 4.5 : 5.5;
   });
-
-  // silence unused warning
-  void interactive;
 
   return (
     <mesh>
@@ -231,36 +211,53 @@ export default function HalftoneFieldInner({
   strength?: number;
   interactive?: boolean;
 }) {
-  const mouse = useRef({ x: -9999, y: -9999 });
-  const mouseDown = useRef(0);
-  const mouseActive = useRef(0);
+  const trail = useRef<Ripple[]>(
+    Array.from({ length: TRAIL }, () => ({ x: 0, y: 0, age: 99, amp: 0 }))
+  );
   const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
+    const reduced = () =>
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.classList.contains("a11y-reduce");
+    let next = 0;
+    let last = { x: -9999, y: -9999, t: 0 };
+
+    const emit = (x: number, y: number, amp: number) => {
+      if (reduced()) return;
+      trail.current[next] = { x, y, age: 0, amp };
+      next = (next + 1) % TRAIL;
+    };
+
+    // Content sits above the canvas, so track the pointer on window and
+    // hit-test against the field's own box.
     const onMove = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
-      mouse.current.x = e.clientX - r.left;
-      mouse.current.y = e.clientY - r.top;
-      mouseActive.current = 1;
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      if (x < 0 || y < 0 || x > r.width || y > r.height) return;
+      const now = performance.now();
+      const moved = Math.hypot(x - last.x, y - last.y);
+      if (moved > 18 && now - last.t > 40) {
+        emit(x, y, Math.min(1, 0.35 + moved / 160));
+        last = { x, y, t: now };
+      }
     };
-    const onLeave = () => {
-      mouseActive.current = 0;
-      mouseDown.current = 0;
+    const onDown = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      if (x < 0 || y < 0 || x > r.width || y > r.height) return;
+      emit(x, y, interactive ? 2.2 : 1.5);
     };
-    const onDown = () => { if (interactive) mouseDown.current = 1; };
-    const onUp = () => { mouseDown.current = 0; };
-    // listen on window for pointermove so hero cursor drives shader across children
-    window.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerdown", onDown);
-    window.addEventListener("pointerup", onUp);
-    el.addEventListener("pointerleave", onLeave);
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
     return () => {
       window.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointerup", onUp);
-      el.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointerdown", onDown);
     };
   }, [interactive]);
 
@@ -268,7 +265,7 @@ export default function HalftoneFieldInner({
     <div
       ref={wrapRef}
       className="absolute inset-0"
-      style={{ touchAction: interactive ? "none" : "auto", cursor: interactive ? "grab" : "default" }}
+      style={{ touchAction: interactive ? "none" : "auto" }}
     >
       <Canvas
         orthographic
@@ -276,7 +273,7 @@ export default function HalftoneFieldInner({
         gl={{ antialias: false, alpha: false }}
         camera={{ position: [0, 0, 1] }}
       >
-        <Quad strength={strength} interactive={interactive} mouse={mouse} mouseDown={mouseDown} mouseActive={mouseActive} />
+        <Quad strength={strength} trail={trail} />
       </Canvas>
     </div>
   );

@@ -65,7 +65,7 @@ export function A11yMenu() {
         aria-label="Accessibility settings"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-11 w-11 items-center justify-center rounded-md border hover:text-accent transition md:h-7 md:w-7"
+        className="flex h-11 w-11 items-center justify-center rounded-sm border hover:text-accent transition lg:h-7 lg:w-7"
         style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}
       >
         <Accessibility size={13} />
@@ -100,7 +100,7 @@ export function A11yMenu() {
               </span>
               <span className="flex-1">
                 <span className="block text-xs text-text">{t.label}</span>
-                <span className="block font-mono text-[10px] text-text-muted">{t.desc}</span>
+                <span className="block font-mono text-[11px] text-text-muted">{t.desc}</span>
               </span>
             </button>
           ))}

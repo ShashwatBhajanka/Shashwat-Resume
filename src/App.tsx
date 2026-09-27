@@ -1,5 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Brain,
+  Calculator,
+  Code,
+  Database,
+  FlaskConical,
+  Mic,
+  Music,
+  Rocket,
+  Sigma,
+  Terminal,
+  TrendingUp,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { Nav } from "@/components/portfolio/Nav";
 import { HalftoneField } from "@/components/portfolio/HalftoneField";
 import { Reveal } from "@/components/portfolio/Reveal";
@@ -12,9 +27,9 @@ import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
 import { Carousel3D } from "@/components/portfolio/Carousel3D";
 import { ExperienceScroll } from "@/components/portfolio/ExperienceScroll";
 
-function SectionLabel({ children }: { children: string }) {
-  return <div className="label-tag mb-4">{children}</div>;
-}
+// One container + gutter for every band on the page (the nav uses the same).
+const CONTAINER = "mx-auto max-w-[1100px] px-5 md:px-8";
+const SECTION = `${CONTAINER} py-20 md:py-24`;
 
 function H2({ children }: { children: React.ReactNode }) {
   return (
@@ -27,10 +42,14 @@ function H2({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Chip({ children }: { children: React.ReactNode }) {
+function Intro({ children }: { children: React.ReactNode }) {
+  return <p className="mt-5 max-w-[560px] text-[15px] leading-relaxed text-text-soft">{children}</p>;
+}
+
+function Chip({ children, strong }: { children: React.ReactNode; strong?: boolean }) {
   return (
     <span
-      className="inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[10px] text-text-soft"
+      className={`inline-flex h-7 items-center border px-2.5 font-mono text-[11px] ${strong ? "text-text" : "text-text-soft"}`}
       style={{ borderColor: "var(--border)" }}
     >
       {children}
@@ -39,13 +58,17 @@ function Chip({ children }: { children: React.ReactNode }) {
 }
 
 function Divider() {
-  return <div className="h-px w-full" style={{ background: "var(--border-soft)" }} />;
+  return (
+    <div className={CONTAINER}>
+      <div className="h-px w-full" style={{ background: "var(--border)" }} />
+    </div>
+  );
 }
 
 const EDUCATION = [
   {
     school: "Ashoka University",
-    date: "2025 – 2029",
+    date: "2025 - 2029",
     degree: "BSc in Computer Science · Sonipat, India",
     group: "Relevant Coursework",
     chips: [
@@ -53,11 +76,12 @@ const EDUCATION = [
       "Calculus",
       "Intro to Computer Science (B+)",
       "Discrete Mathematics (A−)",
-      "Data Structures & Algorithms(current)",
-      "Probability & statistics",
-      "Accounting & financial statements"
+      "Data Structures & Algorithms (current)",
+      "Probability & Statistics",
+      "Accounting & Financial Statements"
     ],
-    image: "/ashoka.png",
+    image: "/ashoka-university-logo.png",
+    imageAlt: "Ashoka University logo",
   },
   {
     school: "Fountainhead School",
@@ -67,7 +91,8 @@ const EDUCATION = [
       { label: "Higher Level", chips: ["Mathematics AI HL (7/7)", "Computer Science HL (6/7)", "Economics HL (6/7)"] },
       { label: "Standard Level", chips: ["Psychology SL (6/7)", "English SL (6/7)", "Hindi SL (6/7)"] },
     ],
-    image: "/FHS.png",
+    image: "/fountainhead-school-logo.png",
+    imageAlt: "Fountainhead School logo",
   },
 ];
 
@@ -110,153 +135,110 @@ const PROGRAMMING = [
   { name: "Django", level: "Intermediate", pct: 65 },
 ];
 
-const YEARS_OF_EXPERIENCE = Math.max(
-  0,
-  Math.floor((Date.now() - new Date("2022-06-01").getTime()) / (365.25 * 24 * 3600 * 1000))
-);
-
 type Card = {
-  emoji: string;
+  icon: LucideIcon;
   title: string;
   year?: string;
   org: string;
   desc?: string;
-  accent: string;
   image?: string;
+  alt?: string;
 };
 
 const ACHIEVEMENTS: Card[] = [
-  { emoji: "🏅", title: "Distinction, Euclid Mathematics Competition", year: "2024",
+  { icon: Sigma, title: "Distinction, Euclid Mathematics Competition", year: "2024",
     org: "University of Waterloo (CEMC)",
     desc: "Achieved a Distinction ranking in the Euclid Mathematics Contest, a competitive problem-solving exam covering algebra, geometry, and calculus.",
-    accent: "#1A6B5A",
-    image: "/achievemements/EuclidMath.png" },
-  { emoji: "🎵", title: "Trinity Piano & Music Theory, Distinction – Grade 2", year: "2023–24",
+    image: "/achievements/euclid-math-distinction.jpg",
+    alt: "Euclid Mathematics Contest certificate of distinction awarded to Shashwat Bhajanka by the University of Waterloo CEMC" },
+  { icon: Music, title: "Trinity Piano & Music Theory, Distinction, Grade 2", year: "2023-24",
     org: "Trinity College London",
     desc: "Earned a Distinction in Grade 2 Piano Practical and Music Theory examinations, demonstrating proficiency in performance and theoretical understanding.",
-    accent: "#6D28D9",
-    image: "/achievemements/Piano.png" },
-  { emoji: "🥇", title: "First Place, Inter-School Competition", year: "2023",
+    image: "/achievements/trinity-piano-distinction.jpg",
+    alt: "Trinity College London Grade 2 piano and music theory certificate with distinction" },
+  { icon: Mic, title: "First Place, Inter-School Competition", year: "2023",
     org: "Fountainhead School",
     desc: "Represented Fountainhead School as band lead and lead singer, securing first place.",
-    accent: "#B45309",
-    image: "/achievemements/MusicCompetition.png" },
+    image: "/achievements/inter-school-music-competition.jpg",
+    alt: "Shashwat Bhajanka performing as lead singer with the Fountainhead School band at the inter-school music competition" },
 ];
 
 const CERTIFICATIONS: Card[] = [
-  { emoji: "🤖", title: "Claude Code in Action", year: "2026", org: "Anthropic",
-    accent: "#C2692C",
-    image: "/Certifications/ClaudeCert.png" },
-  { emoji: "🤖", title: "Machine Learning Basics", year: "2024", org: "Sung Kyun Kwan University",
+  { icon: Terminal, title: "Claude Code in Action", year: "2026", org: "Anthropic",
+    image: "/certifications/claude-code-in-action.jpg",
+    alt: "Anthropic Claude Code in Action course completion certificate" },
+  { icon: Brain, title: "Machine Learning Basics", year: "2024", org: "Sungkyunkwan University",
     desc: "Completed an introductory course on Machine Learning. Learnt and practiced concepts such as supervised learning, regression, and classification models.",
-    accent: "#0369A1",
-    image: "/Certifications/MachineLearning.png" },
-  { emoji: "🗄️", title: "SQL Programming", year: "2024", org: "Udemy",
+    image: "/certifications/machine-learning.jpg",
+    alt: "Sungkyunkwan University Machine Learning Basics course certificate" },
+  { icon: Database, title: "SQL Programming", year: "2024", org: "Udemy",
     desc: "Learnt advanced SQL techniques, including complex data querying, multi-table joins, and data merging to drive actionable insights.",
-    accent: "#047857",
-    image: "/Certifications/SQL.png" },
-  { emoji: "🐍", title: "Python — 100 Days of Code", year: "2024", org: "Udemy",
-    accent: "#B45309",
-    image: "/Certifications/Python.png" },
-  { emoji: "💰", title: "Fundamental Financial Mathematics", year:"2024", org: "Udemy",
-    accent: "#4F46E5",
-    image: "/Certifications/FinancialMath.png" },
-  { emoji: "📊", title: "Introduction to Econometrics", year:"2023",org: "Udemy",
-    accent: "#7C3AED",
-    image: "/Certifications/Econometrics.png" },
-  { emoji: "🔬", title: "Data Science",  year:"2023", org: "Udemy",
-    accent: "#0891B2",
-    image: "/Certifications/DataSceince.png" },
-  { emoji: "🚀", title: "Entrepreneurship", year:"2021", org: "Clever Harvey",
-    accent: "#C2410C",
-    image: "/Certifications/Entreprenureship.png" },
+    image: "/certifications/sql-programming.jpg",
+    alt: "Udemy SQL programming course completion certificate" },
+  { icon: Code, title: "Python: 100 Days of Code", year: "2024", org: "Udemy",
+    image: "/certifications/python-100-days.jpg",
+    alt: "Udemy 100 Days of Code Python bootcamp completion certificate" },
+  { icon: Calculator, title: "Fundamental Financial Mathematics", year: "2024", org: "Udemy",
+    image: "/certifications/financial-mathematics.jpg",
+    alt: "Udemy Fundamental Financial Mathematics course completion certificate" },
+  { icon: TrendingUp, title: "Introduction to Econometrics", year: "2023", org: "Udemy",
+    image: "/certifications/econometrics.jpg",
+    alt: "Udemy Introduction to Econometrics course completion certificate" },
+  { icon: FlaskConical, title: "Data Science", year: "2023", org: "Udemy",
+    image: "/certifications/data-science.jpg",
+    alt: "Udemy Data Science course completion certificate" },
+  { icon: Rocket, title: "Entrepreneurship", year: "2021", org: "Clever Harvey",
+    image: "/certifications/entrepreneurship.jpg",
+    alt: "Clever Harvey Entrepreneurship course certificate" },
 ];
 
-function CarouselFlipCard({ card, onClick }: { card: Card; onClick: () => void }) {
+function IconTile({ icon: Icon, size = 18 }: { icon: LucideIcon; size?: number }) {
   return (
-    <motion.button
+    <span
+      className="flex h-10 w-10 shrink-0 items-center justify-center border text-accent"
+      style={{ borderColor: "var(--border)", background: "var(--accent-dim)" }}
+      aria-hidden="true"
+    >
+      <Icon size={size} strokeWidth={1.5} />
+    </span>
+  );
+}
+
+function CarouselCard({ card, onClick }: { card: Card; onClick: () => void }) {
+  return (
+    <button
       type="button"
       onClick={onClick}
-      className="absolute inset-0 w-full h-full overflow-hidden text-left cursor-pointer"
+      aria-label={`View details: ${card.title}`}
+      className="group absolute inset-0 flex h-full w-full flex-col overflow-hidden p-6 text-left"
       style={{ background: "var(--bg-elevated)" }}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
     >
-      <motion.div
-        className="absolute inset-0 flex flex-col p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div className="flex items-start justify-between">
-          <motion.div
-            className="flex h-11 w-11 items-center justify-center border text-lg"
-            style={{
-              borderColor: "var(--border)",
-              background: `color-mix(in oklab, ${card.accent} 14%, transparent)`,
-            }}
-            initial={{ scale: 0.8, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          >
-            {card.emoji}
-          </motion.div>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
-            {card.year ?? ""}
-          </span>
-        </div>
-        <motion.div
-          className="mt-8"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="label-tag mb-2">{card.org}</div>
-          <div className="text-[18px] font-semibold leading-tight text-text display-tight">
-            {card.title}
-          </div>
-        </motion.div>
-        <motion.div
-          className="mt-auto pt-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {card.image ? (
-            <motion.img
-              src={card.image}
-              alt={card.title}
-              className="w-full aspect-[16/9] object-cover rounded-xl"
-              style={{ borderRadius: "12px" }}
-              initial={{ scale: 1.05, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            />
-          ) : (
-            <ImagePlaceholder aspect="16/9" />
-          )}
-        </motion.div>
-        <motion.div
-          className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-text-muted"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2, delay: 0.3 }}
-        >
-          <span>detail</span>
-          <span>tap to view →</span>
-        </motion.div>
-        <motion.div
-          className="absolute inset-x-0 top-0 h-1"
-          style={{
-            background: `linear-gradient(90deg, ${card.accent}, color-mix(in oklab, ${card.accent} 40%, transparent))`,
-            transformOrigin: "left center",
-          }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.1 }}
-        />
-      </motion.div>
-    </motion.button>
+      <span className="absolute inset-x-0 top-0 h-0.5" style={{ background: "var(--accent)" }} />
+      <div className="flex items-start justify-between">
+        <IconTile icon={card.icon} />
+        <span className="font-mono text-[11px] uppercase tracking-widest text-text-muted">{card.year ?? ""}</span>
+      </div>
+      <div className="mt-8">
+        <div className="label-tag mb-2">{card.org}</div>
+        <h4 className="display-tight text-[20px] leading-tight text-text">{card.title}</h4>
+      </div>
+      <div className="mt-auto pt-6">
+        {card.image ? (
+          <img
+            src={card.image}
+            alt={card.alt ?? card.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full aspect-[16/9] object-cover rounded-sm"
+          />
+        ) : (
+          <ImagePlaceholder aspect="16/9" label={`${card.title}: image coming soon`} />
+        )}
+      </div>
+      <div className="mt-4 font-mono text-[11px] uppercase tracking-widest text-text-muted transition-colors group-hover:text-accent">
+        View →
+      </div>
+    </button>
   );
 }
 
@@ -267,58 +249,68 @@ type ClubCardData = {
   tags: string[];
   meta?: string;
   image?: string;
+  alt?: string;
 };
 
-function ClubCard({ c }: { c: ClubCardData }) {
+function ClubCard({ c, featured }: { c: ClubCardData; featured?: boolean }) {
   return (
-    <div className="h-full border p-6" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+    <div
+      className={`h-full border p-6 ${featured ? "md:grid md:grid-cols-2 md:items-center md:gap-8" : ""}`}
+      style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}
+    >
       {c.image ? (
         <img
           src={c.image}
-          alt={c.org}
-          className="w-full aspect-[16/9] object-cover mb-5"
-          style={{ borderRadius: "4px" }}
+          alt={c.alt ?? c.org}
+          loading="lazy"
+          decoding="async"
+          className="w-full aspect-[16/9] object-cover rounded-sm"
         />
       ) : (
-        <ImagePlaceholder aspect="16/9" />
+        <ImagePlaceholder aspect="16/9" label={`${c.org}: photo coming soon`} />
       )}
-      <div className="mt-5 flex items-center justify-between">
-        <div className="label-tag">{c.org}</div>
-        {c.meta && (
-          <div className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
-            {c.meta}
-          </div>
-        )}
+      <div className={featured ? "mt-5 md:mt-0" : "mt-5"}>
+        <div className="flex items-center justify-between">
+          <div className="label-tag">{c.org}</div>
+          {c.meta && (
+            <div className="font-mono text-[11px] uppercase tracking-widest text-accent">
+              {c.meta}
+            </div>
+          )}
+        </div>
+        <h3 className="display-tight mt-2 text-text" style={{ fontSize: featured ? "28px" : "20px" }}>{c.role}</h3>
+        <p className="mt-3 text-[15px] leading-relaxed text-text-soft">{c.desc}</p>
+        <div className="mt-4 flex flex-wrap gap-1.5">{c.tags.map((t) => <Chip key={t}>{t}</Chip>)}</div>
       </div>
-      <div className="mt-2 text-lg font-semibold text-text display-tight">{c.role}</div>
-      <p className="mt-3 text-sm leading-relaxed text-text-soft">{c.desc}</p>
-      <div className="mt-4 flex flex-wrap gap-1.5">{c.tags.map((t) => <Chip key={t}>{t}</Chip>)}</div>
     </div>
   );
 }
 
 const CLUBS: ClubCardData[] = [
   {
-    role: "Head of Dept — Research & Data Insights",
+    role: "Co-Director of Builders",
+    org: "AI4All",
+    desc: "Building and shipping products with AI, and teaching students (including those new to AI) how to use AI tools to create real products.",
+    tags: ["AI", "Teaching", "Product Building"],
+    meta: "Present",
+    image: "/ai4all-builders.jpg",
+    alt: "AI4All builders session with students building products using AI tools",
+  },
+  {
+    role: "Head of Research & Data Insights",
     org: "Ashoka Data Society",
     desc: "Lead independent research using university resources and varied data sources, publishing insights in a curated data review for the campus community.",
     tags: ["Research", "Data Analysis", "Publishing"],
-    image: "/data.png",
-  },
-  {
-    role: "Co-Director of Builders",
-    org: "AI4All",
-    desc: "Building and shipping products using AI, while teaching students — including those new to AI — how to use AI tools to create real products.",
-    tags: ["AI", "Teaching", "Product Building"],
-    meta: "Present",
-    image: "/AI4All.png",
+    image: "/ashoka-data-society.png",
+    alt: "Ashoka Data Society logo",
   },
   {
     role: "Full Stack Developer",
     org: "Ashoka Ministry of Technology",
-    desc: "Build and maintain university services used by 3,000+ students — applying web dev and analytics to identify real student needs.",
+    desc: "Build and maintain university services used by 3,000+ students, using web development and analytics to find real student needs.",
     tags: ["Full Stack", "3,000+ Users"],
-    image: "/TechMin.jpg",
+    image: "/ashoka-ministry-of-technology.jpg",
+    alt: "Ashoka Ministry of Technology team banner",
   },
   {
     role: "Vocalist",
@@ -326,7 +318,8 @@ const CLUBS: ClubCardData[] = [
     desc: "Member of the university's acapella society, performing at campus events and inter-college showcases.",
     tags: ["Acapella", "Performance"],
     meta: "Present",
-    image: "/AppleCello.JPG",
+    image: "/ashoka-apple-cellos.jpg",
+    alt: "Ashoka Apple Cellos a cappella group performing on stage",
   },
   {
     role: "Varsity Player",
@@ -334,9 +327,89 @@ const CLUBS: ClubCardData[] = [
     desc: "Represent Ashoka University on the Ultimate Frisbee varsity team across regional tournaments.",
     tags: ["Frisbee", "Varsity"],
     meta: "Present",
-    image: "/Frisbee.JPG",
+    image: "/ashoka-hammerheads-frisbee.jpg",
+    alt: "Ashoka Hammerheads ultimate frisbee varsity team",
   },
 ];
+
+const LINKS = [
+  { label: "Email", href: "mailto:bhajankashashwat@gmail.com" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/shashwat-bhajanka" },
+  { label: "GitHub", href: "https://github.com/ShashwatBhajanka" },
+];
+
+function CardModal({ card, onClose }: { card: Card; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Move focus in, keep Tab inside, and hand focus back to the opener on close.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusables = dialogRef.current.querySelectorAll<HTMLElement>("button, a[href]");
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener?.focus();
+    };
+  }, []);
+
+  return (
+    <motion.div
+      ref={dialogRef}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="card-modal-title"
+    >
+      <button
+        ref={closeRef}
+        type="button"
+        aria-label="Close"
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        className="absolute top-4 right-4 z-10 flex h-11 w-11 items-center justify-center rounded-sm border text-white/80 hover:text-white transition"
+        style={{ borderColor: "rgba(255,255,255,0.2)" }}
+      >
+        <X size={18} />
+      </button>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 16 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-sm border"
+        style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <span className="absolute inset-x-0 top-0 h-0.5" style={{ background: "var(--accent)" }} />
+        {card.image && <img src={card.image} alt={card.alt ?? card.title} className="w-full" />}
+        <div className="p-6 md:p-8">
+          <div className="mb-3 flex items-center gap-3">
+            <IconTile icon={card.icon} size={16} />
+            <div className="label-tag">{card.org}{card.year ? ` · ${card.year}` : ""}</div>
+          </div>
+          <h3 id="card-modal-title" className="display-tight text-xl md:text-2xl leading-tight text-text">
+            {card.title}
+          </h3>
+          {card.desc && <p className="mt-4 text-[15px] leading-relaxed text-text-soft">{card.desc}</p>}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export function App() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -356,37 +429,30 @@ export function App() {
       <BackToTop />
 
       <section id="home" className="relative">
-        <HalftoneField strength={0.75} className="min-h-[100svh] hero-scrim">
-          <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1100px] flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-24 md:pt-40">
-            <Reveal>
-              <div className="label-tag mb-6" style={{ color: "var(--text)" }}>Portfolio · 2026</div>
-            </Reveal>
+        <HalftoneField strength={0.75} className="min-h-[100dvh] hero-scrim">
+          <div className={`relative z-10 flex min-h-[100dvh] flex-col justify-end pb-16 pt-24 md:pb-24 ${CONTAINER}`}>
             <Reveal delay={0.1}>
               <h1
-                className="display-tight text-text"
-                style={{ fontSize: "clamp(56px, 12vw, 132px)" }}
+                className="font-dots text-text"
+                style={{ fontSize: "clamp(52px, 11vw, 124px)", lineHeight: 0.92 }}
               >
                 Shashwat<br />Bhajanka
               </h1>
-             </Reveal>
+            </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-8 max-w-[560px] text-[15px] leading-relaxed text-text-soft">
-                Computer Science Student &amp; Data Analyst. Building at the intersection of data, code, and impact. Hands-on experience in analytics, web development, and research.
+              <p className="mt-8 max-w-[560px] text-[16px] leading-relaxed text-text-soft">
+                Computer Science student at Ashoka University and Python &amp; data analytics intern, building data pipelines and web apps.
               </p>
             </Reveal>
             <Reveal delay={0.3}>
-              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs">
-                {[
-                  { label: "Email", href: "mailto:bhajankashashwat@gmail.com" },
-                  { label: "LinkedIn", href: "https://linkedin.com/in/shashwat-bhajanka" },
-                  { label: "GitHub", href: "https://github.com/ShashwatBhajanka" },
-                ].map((l) => (
+              <div className="mt-4 flex flex-wrap gap-x-6">
+                {LINKS.map((l) => (
                   <a
                     key={l.label}
                     href={l.href}
                     target={l.href.startsWith("http") ? "_blank" : undefined}
                     rel="noreferrer"
-                    className="font-mono uppercase tracking-widest text-text underline underline-offset-[6px] decoration-text-muted hover:decoration-accent hover:text-accent transition"
+                    className="inline-flex min-h-11 items-center font-mono text-[12px] uppercase tracking-widest text-text underline underline-offset-[6px] decoration-text-muted hover:decoration-accent hover:text-accent transition"
                   >
                     {l.label} ↗
                   </a>
@@ -398,62 +464,58 @@ export function App() {
       </section>
 
       <main id="main" className="relative scroll-mt-16">
-        <section id="overview" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
-          <Reveal><SectionLabel>Introduction</SectionLabel></Reveal>
-          <Reveal delay={0.05}><H2>About Me</H2></Reveal>
-          <div className="mt-10 max-w-[820px] text-[20px] md:text-[24px] leading-[1.45] font-light">
-            <ScrollBrightenText text="Welcome to my digital notebook — a curated collection of my academic journey, professional experience, technical skills, and the things I've built along the way. Every entry here represents a chapter of growth, from classroom theory to real-world impact. I thrive at the crossroads of data science, software engineering, and creative problem-solving." />
+        <section id="overview" className={SECTION}>
+          <Reveal><H2>About Me</H2></Reveal>
+          <div className="mt-6 max-w-[820px] text-[20px] md:text-[24px] leading-[1.45] font-light">
+            <ScrollBrightenText text="I'm a Computer Science student at Ashoka University who likes turning messy data into software people actually use. As a Python and data analytics intern at Lemon Technologies, I build PDF parsing pipelines that cut manual processing time by more than 60%. On campus I build services used by 3,000+ students, lead research at the Ashoka Data Society, and teach students to ship products with AI." />
           </div>
           <Reveal delay={0.2}>
-            <div className="mt-16 grid grid-cols-3 gap-4 border-t pt-10" style={{ borderColor: "var(--border)" }}>
+            <div className="mt-12 grid grid-cols-1 gap-8 border-t pt-8 sm:grid-cols-3 sm:gap-4" style={{ borderColor: "var(--border)" }}>
               {[
-                { n: 3, label: "Projects" },
-                { n: YEARS_OF_EXPERIENCE, label: "Years of Experience" },
-                { n: EXPERIENCE.length, label: "Roles Held" },
-              ].map((s, i) => (
-                <div key={i} className="border-l pl-5 first:border-l-0 first:pl-0" style={{ borderColor: "var(--border)" }}>
-                  <div className="display-tight text-text" style={{ fontSize: "clamp(48px, 8vw, 96px)" }}>
-                    {s.n === null ? <span className="text-text-muted">—</span> : <Counter to={s.n} />}
+                { n: EXPERIENCE.length, label: "Roles held" },
+                { n: CERTIFICATIONS.length, label: "Certifications" },
+                { n: 3000, suffix: "+", label: "Students served" },
+              ].map((s) => (
+                <div key={s.label} className="sm:border-l sm:pl-5 sm:first:border-l-0 sm:first:pl-0" style={{ borderColor: "var(--border)" }}>
+                  <div className="font-dots leading-none text-text" style={{ fontSize: "clamp(44px, 6vw, 80px)" }}>
+                    <Counter to={s.n} suffix={s.suffix} />
                   </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    <span className="label-tag">{s.label}</span>
-                  </div>
+                  <div className="label-tag mt-3">{s.label}</div>
                 </div>
               ))}
             </div>
           </Reveal>
         </section>
 
+        <Divider />
 
-
-
-        <section id="education" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
-          <Reveal><SectionLabel>Education</SectionLabel></Reveal>
-          <Reveal delay={0.05}><H2>Academic Background</H2></Reveal>
+        <section id="education" className={SECTION}>
+          <Reveal><H2>Education</H2></Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-5 max-w-[560px] text-sm text-text-soft">Coursework, grades, and the foundation of my analytical thinking.</p>
+            <Intro>Coursework, grades, and the foundation of my analytical thinking.</Intro>
           </Reveal>
-          <div className="mt-16 space-y-14">
+          <div className="mt-10 space-y-10">
             {EDUCATION.map((e, i) => (
               <Reveal key={i} delay={i * 0.08}>
                 <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-10 border-t pt-8" style={{ borderColor: "var(--border)" }}>
-                  <div className="font-mono text-[11px] uppercase tracking-widest text-text-muted">{e.date}</div>
-                  <div className="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-6">
-                    <div className="w-40">
+                  <div className="font-mono text-[12px] uppercase tracking-widest text-text-muted">{e.date}</div>
+                  <div className="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-6">
+                    <div className="w-24 md:w-full">
                       {e.image ? (
                         <img
                           src={e.image}
-                          alt={e.school}
-                          className="w-full aspect-square object-cover"
-                          style={{ borderRadius: "8px" }}
+                          alt={e.imageAlt ?? e.school}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full aspect-square object-cover rounded-sm"
                         />
                       ) : (
-                        <ImagePlaceholder aspect="1/1" />
+                        <ImagePlaceholder aspect="1/1" label={`${e.school} logo`} />
                       )}
                     </div>
                     <div>
-                      <div className="text-2xl md:text-3xl font-semibold text-text display-tight">{e.school}</div>
-                      <div className="mt-2 text-sm text-text-soft">{e.degree}</div>
+                      <h3 className="display-tight text-2xl md:text-3xl text-text">{e.school}</h3>
+                      <div className="mt-2 text-[15px] text-text-soft">{e.degree}</div>
                       {"chips" in e && e.chips ? (
                         <div className="mt-6">
                           <div className="label-tag mb-3">{e.group}</div>
@@ -481,7 +543,7 @@ export function App() {
         <Divider />
 
         <section id="experience" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
-          <Reveal><SectionLabel>Experience</SectionLabel></Reveal>
+          <Reveal><div className="label-tag mb-4">Experience</div></Reveal>
           <Reveal delay={0.05}><H2>Where I've Worked</H2></Reveal>
           <Reveal delay={0.1}>
             <p className="mt-5 max-w-[560px] text-sm text-text-soft">Real-world roles that shaped my approach to building and problem-solving.</p>
@@ -491,16 +553,15 @@ export function App() {
 
         <Divider />
 
-        <section id="clubs" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
-          <Reveal><SectionLabel>Campus Life</SectionLabel></Reveal>
-          <Reveal delay={0.05}><H2>Communities &amp; Pursuits</H2></Reveal>
+        <section id="clubs" className={SECTION}>
+          <Reveal><H2>Communities &amp; Pursuits</H2></Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-5 max-w-[560px] text-sm text-text-soft">Where code meets culture — leadership, art, and sport.</p>
+            <Intro>Where code meets culture: leadership, art, and sport.</Intro>
           </Reveal>
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
             {CLUBS.map((c, i) => (
-              <Reveal key={c.org} delay={i * 0.08}>
-                <ClubCard c={c} />
+              <Reveal key={c.org} delay={(i % 2) * 0.08} className={i === 0 ? "md:col-span-2" : undefined}>
+                <ClubCard c={c} featured={i === 0} />
               </Reveal>
             ))}
           </div>
@@ -508,202 +569,123 @@ export function App() {
 
         <Divider />
 
-        <section id="skills" className="mx-auto max-w-[1100px] px-5 md:px-8 py-28 md:py-36">
-          <Reveal><SectionLabel>Skills</SectionLabel></Reveal>
-          <Reveal delay={0.05}><H2>Technical Proficiency</H2></Reveal>
+        <section id="skills" className={SECTION}>
+          <Reveal><H2>Skills</H2></Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-5 max-w-[560px] text-sm text-text-soft">Languages, tools, and competencies I bring to every project.</p>
+            <Intro>Languages, tools, and competencies I bring to every project.</Intro>
           </Reveal>
-          <div className="mt-16 space-y-14">
+          <div className="mt-10 space-y-10">
             <Reveal>
-              <div className="label-tag mb-5">Programming</div>
+              <h3 className="label-tag mb-4">Programming</h3>
               <div className="divide-y" style={{ borderColor: "var(--border-soft)" }}>
                 {PROGRAMMING.map((s) => <SkillBar key={s.name} name={s.name} level={s.level} pct={s.pct} />)}
               </div>
             </Reveal>
             <Reveal>
-              <div className="label-tag mb-5">Tools</div>
-              <div className="flex flex-wrap gap-2">
-                {["Excel", "Google Data Studio", "Claude Code", "Pyhton Libraries", "Orange", "Openrouter", "REST APIs"].map((t) => (
-                  <span key={t} className="border px-4 py-2 text-sm text-text" style={{ borderColor: "var(--border)" }}>{t}</span>
+              <h3 className="label-tag mb-4">Tools</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {["Excel", "Google Data Studio", "Claude Code", "Python Libraries", "Orange", "OpenRouter", "REST APIs"].map((t) => (
+                  <Chip key={t} strong>{t}</Chip>
                 ))}
               </div>
             </Reveal>
             <Reveal>
-              <div className="label-tag mb-5">Competencies</div>
-              <div className="flex flex-wrap gap-2">
+              <h3 className="label-tag mb-4">Competencies</h3>
+              <div className="flex flex-wrap gap-1.5">
                 {[
-                  ["📊", "Data Analysis"], ,["💻","Web App Developement"],["📈", "Statistical Modelling"], ["🧠", "Analytical Thinking"],
-                  ["🔍", "Critical Thinking"], ["📋", "Project Management"], ["🤝", "Team Collaboration"],
-                  ["💡", "Problem Solving"],
-                ].map(([e, l]) => (
-                  <span key={l} className="inline-flex items-center gap-1.5 border px-4 py-2 text-sm text-text" style={{ borderColor: "var(--border)" }}>
-                    <span>{e}</span>{l}
-                  </span>
+                  "Data Analysis", "Web App Development", "Statistical Modelling", "Analytical Thinking",
+                  "Critical Thinking", "Project Management", "Team Collaboration", "Problem Solving",
+                ].map((l) => (
+                  <Chip key={l} strong>{l}</Chip>
                 ))}
               </div>
             </Reveal>
           </div>
         </section>
 
-        <Divider />
-
         <section id="achievements" className="relative">
-          <div className="relative">
-            <HalftoneField strength={0.6} className="h-[360px] hero-scrim">
-              <div className="relative mx-auto flex h-full max-w-[1100px] flex-col justify-end px-5 pb-14 md:px-8">
-                <Reveal><SectionLabel>Portfolio</SectionLabel></Reveal>
-                <Reveal delay={0.05}>
-                  <h2 className="display-tight text-text" style={{ fontSize: "clamp(40px, 7vw, 88px)" }}>
-                    Achievements<br />&amp; Certifications
-                  </h2>
-                </Reveal>
-              </div>
-            </HalftoneField>
-          </div>
-          <div className="mx-auto max-w-[1100px] px-5 md:px-8 py-16 md:py-24">
-            <Reveal delay={0.1}>
-              <p className="max-w-[560px] text-sm text-text-soft">Milestones, credentials, and proof points from the journey so far.</p>
-            </Reveal>
-            <div className="mt-14">
-              <div className="label-tag mb-5">🏅 Achievements · scroll to advance</div>
+          <HalftoneField strength={0.6} className="h-[280px] hero-scrim">
+            <div className={`relative z-10 flex h-full flex-col justify-end pb-4 ${CONTAINER}`}>
+              <Reveal>
+                <h2 className="display-tight text-text" style={{ fontSize: "clamp(40px, 7vw, 80px)" }}>
+                  Achievements<br />&amp; Certifications
+                </h2>
+              </Reveal>
             </div>
+          </HalftoneField>
+          <div className={`${CONTAINER} pt-1`}>
+            <Intro>Awards I have earned and courses I have completed.</Intro>
+            <a href="#certifications" className="sr-only focus:not-sr-only focus:mt-4 focus:inline-block font-mono text-[12px] uppercase tracking-widest text-accent">
+              Skip the achievements carousel
+            </a>
           </div>
           <Carousel3D
             items={ACHIEVEMENTS}
             label="Achievements carousel"
-            renderCard={(a) => <CarouselFlipCard card={a} onClick={() => setSelectedCard(a)} />}
+            header={<h3 className="display-tight text-[28px] text-text">Achievements</h3>}
+            renderCard={(a) => <CarouselCard card={a} onClick={() => setSelectedCard(a)} />}
           />
-          <div className="mx-auto max-w-[1100px] px-5 md:px-8 pt-16">
-            <div className="label-tag mb-5">📜 Certifications · scroll to advance</div>
+          <div id="certifications" className={`${CONTAINER} scroll-mt-16`}>
+            <a href="#contact" className="sr-only focus:not-sr-only focus:mt-4 focus:inline-block font-mono text-[12px] uppercase tracking-widest text-accent">
+              Skip the certifications carousel
+            </a>
           </div>
           <Carousel3D
             items={CERTIFICATIONS}
             label="Certifications carousel"
-            renderCard={(a) => <CarouselFlipCard card={a} onClick={() => setSelectedCard(a)} />}
+            header={<h3 className="display-tight text-[28px] text-text">Certifications</h3>}
+            renderCard={(c) => <CarouselCard card={c} onClick={() => setSelectedCard(c)} />}
           />
+          <div className="h-16 md:h-24" aria-hidden="true" />
         </section>
 
         <footer id="contact" className="relative">
           <HalftoneField strength={1} interactive className="h-[560px]">
-            <div className="relative mx-auto flex h-full max-w-[1100px] flex-col justify-between px-5 py-14 md:px-8">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-text" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
-                  Contact
-                </span>
-                <span className="border px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
-                  Always open to a conversation
-                </span>
-              </div>
-              <div className="text-center">
-                <div className="display-tight" style={{ fontSize: "clamp(40px, 8vw, 108px)", fontWeight: 800 }}>
+            <div className={`relative z-10 flex h-full flex-col justify-between py-14 ${CONTAINER}`}>
+              <h2 className="label-tag" style={{ color: "var(--text)" }}>Contact</h2>
+              <div>
+                <div className="display-tight" style={{ fontSize: "clamp(36px, 7vw, 96px)", fontWeight: 800 }}>
                   <span className="inline-block px-3 py-1" style={{ background: "var(--accent)", color: "var(--bg)" }}>
-                    Have an idea?
+                    Building with data?
                   </span>
                   <br />
                   <span className="mt-2 inline-block px-3 py-1" style={{ background: "var(--accent)", color: "var(--bg)" }}>
-                    Let&apos;s make it real.
+                    Let&apos;s talk.
                   </span>
                 </div>
-                <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                  {[
-                    { label: "Email", href: "mailto:bhajankashashwat@gmail.com" },
-                    { label: "LinkedIn", href: "https://linkedin.com/in/shashwat-bhajanka" },
-                    { label: "GitHub", href: "https://github.com/ShashwatBhajanka" },
-                  ].map((l) => (
+                <div className="mt-10 flex flex-wrap items-center gap-3">
+                  {LINKS.map((l) => (
                     <a
                       key={l.label}
                       href={l.href}
                       target={l.href.startsWith("http") ? "_blank" : undefined}
                       rel="noreferrer"
-                      className="border px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-widest transition hover:opacity-80"
-                      style={{ borderColor: "var(--accent)", background: "var(--accent)", color: "var(--bg)" }}
+                      className="inline-flex h-11 items-center border px-5 font-mono text-[12px] font-semibold uppercase tracking-widest text-text transition hover:text-accent"
+                      style={{ borderColor: "var(--accent)", background: "var(--bg-elevated)" }}
                     >
                       {l.label} ↗
                     </a>
                   ))}
                 </div>
               </div>
-              <div className="text-center">
-                <span className="inline-block border px-2.5 py-1 font-mono text-[11px] font-semibold text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex h-7 items-center border px-2.5 font-mono text-[11px] text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
                   Built by Shashwat Bhajanka
                 </span>
-                <span className="ml-2 inline-block border px-2.5 py-1 font-mono text-[10px] font-semibold text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
+                <span className="inline-flex h-7 items-center border px-2.5 font-mono text-[11px] text-text-soft" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}>
                   Last updated · September 2026
                 </span>
               </div>
             </div>
           </HalftoneField>
         </footer>
-       </main>
+      </main>
 
-       <AnimatePresence>
-         {selectedCard && (
-           <motion.div
-             key="modal"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             transition={{ duration: 0.3 }}
-             className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-             style={{ backgroundColor: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}
-             onClick={() => setSelectedCard(null)}
-           >
-             <motion.button
-               type="button"
-               aria-label="Close"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 setSelectedCard(null);
-               }}
-               className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border text-white/70 hover:text-white transition"
-               style={{ borderColor: "var(--border)" }}
-               whileHover={{ scale: 1.1 }}
-               whileTap={{ scale: 0.9 }}
-             >
-               ✕
-             </motion.button>
-             <motion.div
-               key="modal-content"
-               initial={{ opacity: 0, scale: 0.92, y: 20 }}
-               animate={{ opacity: 1, scale: 1, y: 0 }}
-               exit={{ opacity: 0, scale: 0.92, y: 20 }}
-               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-               className="relative w-full max-w-3xl overflow-hidden rounded-2xl border"
-               style={{
-                 borderColor: "var(--border)",
-                 background: "var(--bg-elevated)",
-               }}
-               onClick={(e) => e.stopPropagation()}
-             >
-                {selectedCard.image && (
-                  <img
-                    src={selectedCard.image}
-                    alt={selectedCard.title}
-                    className="w-full rounded-xl"
-                  />
-                )}
-               <div className="p-6 md:p-8">
-                 <div className="mb-2 flex items-center gap-3">
-                   <span className="text-2xl">{selectedCard.emoji}</span>
-                   <div className="label-tag">{selectedCard.org}</div>
-                 </div>
-                 <h3 className="text-xl md:text-2xl font-semibold text-text display-tight leading-tight">
-                   {selectedCard.title}
-                 </h3>
-{selectedCard.desc && (
-                   <p className="mt-4 text-sm leading-relaxed text-text-soft">
-                     {selectedCard.desc}
-                   </p>
-                 )}
-               </div>
-               <div className="absolute inset-x-0 top-0 h-[3px]" style={{
-                 background: `linear-gradient(90deg, ${selectedCard.accent}, color-mix(in oklab, ${selectedCard.accent} 40%, transparent))`,
-               }} />
-             </motion.div>
-           </motion.div>
-         )}
-       </AnimatePresence>
-     </div>
-   );
- }
+      <AnimatePresence>
+        {selectedCard && (
+          <CardModal key="modal" card={selectedCard} onClose={() => setSelectedCard(null)} />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
