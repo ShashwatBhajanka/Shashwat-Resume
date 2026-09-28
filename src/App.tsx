@@ -436,7 +436,7 @@ export function App() {
                 className="font-dots text-text"
                 style={{ fontSize: "clamp(52px, 11vw, 124px)", lineHeight: 0.92 }}
               >
-                Shashwat<br />Bhajanka
+                SHASHWAT<br />BHAJANKA
               </h1>
             </Reveal>
             <Reveal delay={0.2}>
