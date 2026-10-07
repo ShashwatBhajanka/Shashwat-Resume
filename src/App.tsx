@@ -26,6 +26,9 @@ import { ScrollBrightenText } from "@/components/portfolio/ScrollBrightenText";
 
 import { Carousel3D } from "@/components/portfolio/Carousel3D";
 import { ExperienceScroll } from "@/components/portfolio/ExperienceScroll";
+import { ClubsAccordion } from "@/components/portfolio/ClubsAccordion";
+import { ProjectsShowcase, type Project } from "@/components/portfolio/ProjectsShowcase";
+import { GithubCalendar } from "@/components/ui/github-calendar";
 
 // One container + gutter for every band on the page (the nav uses the same).
 const CONTAINER = "mx-auto max-w-[1100px] px-5 md:px-8";
@@ -332,11 +335,64 @@ const CLUBS: ClubCardData[] = [
   },
 ];
 
+const PROJECTS: Project[] = [
+  {
+    name: "FragranceAI", kind: "LLM · RAG", motif: "graph",
+    desc: "A retrieval-augmented LLM specialised for fragrance data, answering questions grounded in notes, accords and brands.",
+    highlights: ["Retrieves relevant fragrance records before generating answers", "Built end to end in Python"],
+    tags: ["Python", "LLM", "RAG"],
+    repo: "https://github.com/ShashwatBhajanka/FragranceAI",
+  },
+  {
+    name: "Ashokan Around", kind: "Web platform", motif: "pins",
+    desc: "A campus platform built for the Ashoka community, with a revamped front end and a companion submission form.",
+    highlights: ["Shipped and deployed on Vercel", "JavaScript front end with form workflows"],
+    tags: ["JavaScript", "Vercel", "Web"],
+    repo: "https://github.com/ShashwatBhajanka/Ashokan-Around",
+    live: "https://v0-platform-revamp.vercel.app",
+  },
+  {
+    name: "Employment Time Series", kind: "Data analysis", motif: "series",
+    desc: "Exploratory and time series analysis of employment data to surface trends, correlations and unexpected insights.",
+    highlights: ["Trend and correlation analysis across periods", "Reproducible notebooks in Python"],
+    tags: ["Python", "Pandas", "Time Series"],
+    repo: "https://github.com/ShashwatBhajanka/Time-Series-Analysis-EmploymentData",
+  },
+  {
+    name: "Political Bias SA", kind: "NLP · Sentiment", motif: "bias",
+    desc: "Sentiment analysis of American news channels and their viewership, probing for political bias in coverage.",
+    highlights: ["Scores coverage sentiment per channel", "Relates sentiment to audience data"],
+    tags: ["Python", "NLP", "Sentiment Analysis"],
+    repo: "https://github.com/ShashwatBhajanka/political_bias_SA",
+  },
+  {
+    name: "This Portfolio", kind: "Web · Design", motif: "dots",
+    desc: "The site you are on: a halftone hero, scroll-driven experience timeline and a light/dark theme with accessibility controls.",
+    highlights: ["React, Tailwind and Framer Motion", "Keyboard and reduced-motion friendly"],
+    tags: ["React", "TypeScript", "Tailwind"],
+    repo: "https://github.com/ShashwatBhajanka/Shashwat-Resume",
+    live: "https://shashwatbhajanka.tech",
+  },
+];
+
 const LINKS = [
   { label: "Email", href: "mailto:bhajankashashwat@gmail.com" },
   { label: "LinkedIn", href: "https://linkedin.com/in/shashwat-bhajanka" },
   { label: "GitHub", href: "https://github.com/ShashwatBhajanka" },
 ];
+
+// mailto: silently does nothing when the browser has no mail app registered.
+// Let it try, and if the page never loses focus, open Gmail compose instead.
+function mailtoFallback(e: React.MouseEvent<HTMLAnchorElement>) {
+  const href = e.currentTarget.getAttribute("href") ?? "";
+  if (!href.startsWith("mailto:")) return;
+  const address = href.slice("mailto:".length);
+  setTimeout(() => {
+    if (document.visibilityState === "hidden" || !document.hasFocus()) return;
+    navigator.clipboard?.writeText(address).catch(() => {});
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(address)}`, "_blank", "noopener");
+  }, 800);
+}
 
 function CardModal({ card, onClose }: { card: Card; onClose: () => void }) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -452,6 +508,7 @@ export function App() {
                     href={l.href}
                     target={l.href.startsWith("http") ? "_blank" : undefined}
                     rel="noreferrer"
+                    onClick={mailtoFallback}
                     className="inline-flex min-h-11 items-center font-mono text-[12px] uppercase tracking-widest text-text underline underline-offset-[6px] decoration-text-muted hover:decoration-accent hover:text-accent transition"
                   >
                     {l.label} ↗
@@ -553,18 +610,30 @@ export function App() {
 
         <Divider />
 
-        <section id="clubs" className={SECTION}>
-          <Reveal><H2>Communities &amp; Pursuits</H2></Reveal>
+        <section id="projects" className={SECTION}>
+          <Reveal><div className="label-tag mb-4">Projects</div></Reveal>
+          <Reveal delay={0.05}><H2>Things I've Built</H2></Reveal>
           <Reveal delay={0.1}>
-            <Intro>Where code meets culture: leadership, art, and sport.</Intro>
+            <Intro>A few projects across AI, data and the web. Pick one to explore it.</Intro>
           </Reveal>
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {CLUBS.map((c, i) => (
-              <Reveal key={c.org} delay={(i % 2) * 0.08} className={i === 0 ? "md:col-span-2" : undefined}>
-                <ClubCard c={c} featured={i === 0} />
-              </Reveal>
-            ))}
+          <Reveal delay={0.15}>
+            <GithubCalendar username="ShashwatBhajanka" className="mt-10" />
+          </Reveal>
+          <ProjectsShowcase projects={PROJECTS} />
+        </section>
+
+        <Divider />
+
+        <section id="clubs" className="py-20 md:py-24">
+          <div className={CONTAINER}>
+            <Reveal><H2>Communities &amp; Pursuits</H2></Reveal>
+            <Reveal delay={0.1}>
+              <Intro>Where code meets culture: leadership, art, and sport.</Intro>
+            </Reveal>
           </div>
+          <Reveal delay={0.15}>
+            <ClubsAccordion items={CLUBS} />
+          </Reveal>
         </section>
 
         <Divider />
@@ -660,6 +729,7 @@ export function App() {
                       href={l.href}
                       target={l.href.startsWith("http") ? "_blank" : undefined}
                       rel="noreferrer"
+                      onClick={mailtoFallback}
                       className="inline-flex h-11 items-center border px-5 font-mono text-[12px] font-semibold uppercase tracking-widest text-text transition hover:text-accent"
                       style={{ borderColor: "var(--accent)", background: "var(--bg-elevated)" }}
                     >
